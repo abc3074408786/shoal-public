@@ -1,0 +1,5 @@
+{
+  "id": "skill-center", "name": "技能中心", "version": "1.0.0", "hostApiVersion": 1,
+  "description": "统一管理项目与全局技能，分发到 Agent，手动同步并保留回滚。",
+  "slots": ["shell.overlay"], "permissions": ["skills.read", "skills.write", "terminal.create"], "localOnly": true
+}

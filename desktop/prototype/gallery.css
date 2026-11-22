@@ -1,0 +1,114 @@
+@import "@fontsource-variable/geist";
+
+:root {
+  color-scheme: light dark;
+  font-family: 'Geist Variable', 'Microsoft YaHei UI', 'Segoe UI', sans-serif;
+  --canvas: light-dark(oklch(0.970 0.007 220), oklch(0.190 0.018 242));
+  --paper: light-dark(oklch(0.995 0.002 220), oklch(0.226 0.021 242));
+  --ink: light-dark(oklch(0.275 0.033 239), oklch(0.932 0.017 231));
+  --muted: light-dark(oklch(0.490 0.042 239), oklch(0.779 0.035 232));
+  --border: light-dark(oklch(0.883 0.023 226), oklch(0.373 0.031 237));
+  --accent: light-dark(oklch(0.472 0.101 231), oklch(0.816 0.090 216));
+  --accent-paper: light-dark(oklch(0.927 0.035 221), oklch(0.300 0.048 232));
+  background: var(--canvas);
+  color: var(--ink);
+}
+
+body {
+  margin: 0;
+}
+
+main {
+  inline-size: min(100% - 2rem, 68rem);
+  margin-inline: auto;
+  padding-block: clamp(1.75rem, 5vw, 4.5rem);
+}
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 1.15rem;
+  padding-block-end: 1.8rem;
+  border-block-end: 1px solid var(--border);
+}
+
+header img {
+  flex: none;
+  inline-size: clamp(2.5rem, 6vw, 3.5rem);
+  block-size: auto;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: clamp(1.55rem, 4vw, 2.6rem);
+  letter-spacing: -0.035em;
+}
+
+header p {
+  margin-block-start: 0.4rem;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+nav {
+  display: grid;
+  gap: 1.65rem;
+  padding-block-start: 1.5rem;
+}
+
+h2 {
+  margin-block-end: 0.65rem;
+  font-size: 1.04rem;
+}
+
+.links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17.5rem), 1fr));
+  gap: 0.55rem;
+}
+
+.links a {
+  display: grid;
+  align-content: start;
+  gap: 0.33rem;
+  min-inline-size: 0;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.55rem;
+  background: var(--paper);
+  color: inherit;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.links a span {
+  color: var(--muted);
+  font-size: 0.83rem;
+  line-height: 1.55;
+}
+
+.links a.primary {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-paper);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .links a:hover {
+    border-color: var(--accent);
+  }
+}
+
+.links a:active {
+  background: var(--accent-paper);
+}
+
+.links a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}

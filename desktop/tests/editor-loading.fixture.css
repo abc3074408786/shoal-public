@@ -1,0 +1,6 @@
+/* Give the actual editor the same bounded content region as the workbench. */
+.ide-shell.editor-fixture {
+  grid-template-columns:minmax(0,1fr);
+  grid-template-rows:auto minmax(0,1fr);
+}
+.editor-fixture>nav { display:flex; flex-wrap:wrap; }

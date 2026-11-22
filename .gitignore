@@ -1,0 +1,35 @@
+/target
+Cargo.lock.bak
+
+# velella runtime artifacts (specs in .velella/tasks/ stay committable)
+.velella/state.db
+.velella/state.db-*
+.velella/logs/
+
+*.swp
+.DS_Store
+
+# Local build products and private runtime data
+node_modules/
+target/
+/target-*/
+desktop/dist/
+desktop/src-tauri/binaries/
+desktop/src-tauri/gen/
+desktop/src-tauri/icons/android/
+desktop/src-tauri/icons/ios/
+artifacts/
+__pycache__/
+*.pyc
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+!.env.sample
+.velella/worktrees/
+.velella/sessions/
+.velella/*.db*
+.velella/*.bak
+
+desktop/release-electron/
+desktop/vendor/conpty/

@@ -1,0 +1,6 @@
+- [x] Confirm the primary homepage tasks with the user.
+- [x] Implement the homepage within the existing visual system and callbacks.
+- [x] Build and exercise search, empty states, project navigation and create/open dialogs in a read-only preview.
+- [x] Check light/dark and narrow layouts with actual project names and paths.
+- [ ] Obtain user feedback on the rendered candidate.
+- [ ] Apply the reviewed candidate to the installed UI if accepted.

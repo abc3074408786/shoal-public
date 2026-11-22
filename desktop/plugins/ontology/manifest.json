@@ -1,0 +1,11 @@
+{
+  "id": "ontology",
+  "name": "开发本体",
+  "version": "1.1.0",
+  "hostApiVersion": 1,
+  "description": "用角色、需求、任务与交付证据组织项目协作。",
+  "slots": ["shell.overlay"],
+  "permissions": ["ontology.read", "ontology.write"],
+  "localOnly": true,
+  "engine": { "version": "semantic-1", "sha256": "299ee455d91055ffa5aa437b016f3d7973cacea9e47a4e5538997683c215add4" }
+}

@@ -1,0 +1,19 @@
+.ui-dialog.session-history{inline-size:min(1040px,calc(100vw - 48px));max-block-size:90dvh;overflow:clip}
+.session-history-summary,.session-history-filters{padding-inline:24px}
+.session-history-summary{font-size:12px;color:var(--muted-foreground);padding-block-end:12px}
+.session-history-filters{display:flex;flex-wrap:wrap;gap:8px;padding-block-end:14px}
+.session-history-filters input{flex:1;min-inline-size:min(100%,180px)}
+.session-history-filters button[aria-pressed=true],.session-history-list button[aria-pressed=true]{background:var(--secondary);color:var(--foreground)}
+.session-history-body{display:grid;min-block-size:180px;max-block-size:65dvh;overflow:auto}
+.session-history-body.has-selection{grid-template-columns:minmax(180px,240px) minmax(0,1fr);block-size:60dvh}
+.session-history .session-history-list{max-block-size:none;min-block-size:0;overflow:auto}
+.session-history-preview{display:flex;flex-direction:column;min-inline-size:0;min-block-size:0;border-inline-start:1px solid var(--border)}
+.session-history-preview>header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border-block-end:1px solid var(--border)}
+.session-history-preview>header>div{display:flex;flex-direction:column;gap:5px;min-inline-size:0}
+.session-history-preview small{font-size:11px;color:var(--muted-foreground)}
+.session-history-preview>.terminal-wrap{flex:1;min-block-size:0}
+.session-history .session-history-error{padding-inline:24px;color:var(--danger)}
+.session-history button:focus-visible{outline:2px solid var(--ring);outline-offset:2px}
+.session-history button:active:not(:disabled){background:var(--secondary)}
+@media (hover:hover) and (pointer:fine){.session-history button:hover:not(:disabled){background:var(--secondary)}}
+@media (width < 650px){.session-history-body.has-selection{grid-template-columns:minmax(0,1fr);max-block-size:65dvh;block-size:auto}.session-history-body.has-selection>.session-history-list{max-block-size:20dvh}.session-history-preview{border-inline-start:0;border-block-start:1px solid var(--border);block-size:40dvh}}

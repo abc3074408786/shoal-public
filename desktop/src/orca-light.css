@@ -1,0 +1,106 @@
+/* Orca light reference, softened after visual feedback: gray-white canvas and darker chrome.
+   Retains Velella's navigation, fish identity, native terminals and saved layout. */
+:root[data-theme="light"] {
+  --surface-page:#f1f1f1;
+  --surface-raised:#f8f8f8;
+  --surface-inset:#e4e4e4;
+  --ink:#282d34;
+  --ink-soft:#626973;
+  --stroke:#d3d7dc;
+  --focus:#4b6384;
+  --on-focus:#fafafa;
+  --ring:#657fa3;
+  --chrome-bg:#e8eaed;
+  --chrome-hover:#dde2e9;
+  --chrome-selected:#dce3ed;
+  --shell-accent:#49658b;
+  --terminal-fg:#2e3434;
+  --terminal-selection:#accef7;
+}
+:root[data-theme="light"]:has(.project-shell) {
+  --background:#f1f1f1;
+  --foreground:#282d34;
+  --card:#f8f8f8;
+  --muted-foreground:#626973;
+  --secondary:#e1e5eb;
+  --border:#d3d7dc;
+  --primary:#4b6384;
+  --accent:#dce3ed;
+  --worktree-sidebar:#e7e9ec;
+  --worktree-sidebar-accent:#dce3ed;
+}
+[data-theme="light"] .workbench-a-shell {
+  --mist-canvas:#f1f1f1;
+  --mist-chrome:var(--chrome-bg);
+  --mist-border:var(--border);
+  --mist-accent:var(--shell-accent);
+}
+[data-theme="light"] .ide-shell.project-shell>.app-titlebar {
+  background:var(--chrome-bg);
+  border-block-end:1px solid var(--border);
+}
+[data-theme="light"] .project-shell .shell-menus button {color:#454c56;}
+[data-theme="light"] .project-shell .shell-history button {color:#626973;}
+[data-theme="light"] .ide-shell.project-shell>.ide-sidebar {padding:18px 12px;}
+[data-theme="light"] .project-shell .workbench-navigation {gap:4px;}
+[data-theme="light"] .ide-shell.project-shell .ide-nav {
+  min-block-size:38px;
+  padding:8px 12px;
+  gap:11px;
+  color:#545c67;
+  border-radius:7px;
+}
+[data-theme="light"] .project-shell .ide-nav>svg {inline-size:17px;block-size:17px;stroke-width:1.65;color:#77808c;}
+[data-theme="light"] .project-shell .sidebar-projects {margin-block-start:20px;}
+[data-theme="light"] .project-shell .layout-terminal-bar {
+  min-block-size:36px;
+  padding-inline:8px;
+  gap:8px;
+  background:var(--chrome-bg);
+}
+[data-theme="light"] .project-shell .layout-terminal-bar .ide-tabs {background:transparent;gap:5px;align-items:center;}
+[data-theme="light"] .project-shell .layout-terminal-bar .ide-tab {min-block-size:32px;border:1px solid transparent;border-radius:7px;}
+[data-theme="light"] .ide-shell.project-shell .layout-terminal-bar .ide-tab.selected {
+  background:#f1f1f1;
+  border-color:#cdd2d9;
+  color:#282d34;
+}
+[data-theme="light"] .project-shell .layout-terminal-bar .ide-tab.selected>button:first-child {font-weight:550;}
+[data-theme="light"] .project-shell .layout-terminal-bar .ide-tab.selected>button:first-child>svg {color:var(--shell-accent);}
+[data-theme="light"] .project-shell .layout-terminal-bar .ide-tab>button:not(:first-child) {opacity:.5;min-inline-size:26px;}
+[data-theme="light"] .project-shell .layout-terminal-bar .ide-tab:is(:hover,:focus-within)>button {opacity:1;}
+[data-theme="light"] .project-shell .layout-terminal-bar button {color:#626973;}
+[data-theme="light"] .project-shell .layout-terminal-bar button>svg {stroke-width:1.65;}
+[data-theme="light"] .project-shell .layout-project-column>.wb-body {
+  margin:0;
+  border:0;
+  border-block-start:1px solid var(--border);
+  border-radius:0;
+}
+[data-theme="light"] .project-shell .terminal-status {
+  min-block-size:34px;
+  padding:7px 8px;
+  gap:12px;
+  font-size:12px;
+  line-height:1.5;
+  color:var(--muted-foreground);
+  background:#ebedef;
+  border-block-end:1px solid var(--border);
+}
+[data-theme="light"] .project-shell .terminal-status button {
+  min-block-size:24px;
+  padding:2px 8px;
+  font-size:12px;
+  color:#404040;
+  background:#f8f8f8;
+  border:1px solid #cccccc;
+  border-radius:5px;
+}
+[data-theme="light"] .project-shell .terminal-activity>header {min-block-size:30px;padding:2px 8px;background:#ebedef;}
+[data-theme="light"] .project-shell .terminal-activity>header>.ui-button {min-block-size:26px;font-size:12px;font-weight:500;padding:3px 0;}
+[data-theme="light"] .project-shell .ide-sidebar .ide-nav.selected {background:var(--chrome-selected);color:#334d70;font-weight:550;}
+[data-theme="light"] .project-shell .ide-sidebar .ide-nav.selected>svg {color:var(--shell-accent);}
+@media(hover:hover) and (pointer:fine) {
+  [data-theme="light"] .project-shell .layout-terminal-bar button:hover:not(:disabled) {background:var(--chrome-hover);}
+  [data-theme="light"] .project-shell .ide-sidebar .ide-nav:hover:not(:disabled) {background:var(--chrome-hover);color:#334d70;}
+}

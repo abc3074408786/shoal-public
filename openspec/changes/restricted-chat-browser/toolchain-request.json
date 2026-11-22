@@ -1,0 +1,15 @@
+{
+  "schema": "design-pipeline.toolchain-request.v1",
+  "framework": "react",
+  "brief": "Verify existing WorkspaceApp in browser with independent test backend. Reuse current Vite, React, CSS and UI controls; no redesign or dependencies.",
+  "existing": {
+    "styling": "none",
+    "uiLibrary": "none"
+  },
+  "requested": {
+    "styling": "none",
+    "uiLibrary": "none"
+  },
+  "jobPlanPath": "openspec/changes/restricted-chat-browser/job-plan.json",
+  "jobPlanSha256": "0960d12003da17816547d76f11abb6270da1de926502e9ffadf13bf70a28ad99"
+}

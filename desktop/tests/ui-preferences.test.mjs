@@ -1,0 +1,12 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import ts from 'typescript';
+const source=readFileSync(new URL('../src/ui-preferences.ts',import.meta.url),'utf8');
+const compiled=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText;
+const {parseTheme,readPreference,writePreference,clampPanelWidth}=await import('data:text/javascript;base64,'+Buffer.from(compiled).toString('base64'));
+test('unknown saved theme keeps existing dark default',()=>{for(const value of [null,undefined,'system','corrupt',{},42])assert.equal(parseTheme(value),'dark');assert.equal(parseTheme('light'),'light')});
+test('sidebar width stays in bounds across narrower windows',()=>{assert.equal(clampPanelWidth(460,220,280),280);assert.equal(clampPanelWidth(10,220,480),220);assert.equal(clampPanelWidth(NaN,220,480),220);assert.equal(clampPanelWidth(300,220,480),300)});
+test('valid preferences round trip without touching session keys',()=>{const values=new Map([['velella:workspace','existing-workspace'],['velella:draft:session:file','draft']]);globalThis.localStorage={getItem:key=>values.get(key)??null,setItem:(key,value)=>values.set(key,value)};writePreference('velella:ui:theme','light');writePreference('velella:ui:right-open',false);assert.equal(readPreference('velella:ui:theme','dark'),'light');assert.equal(readPreference('velella:ui:right-open',true),false);assert.equal(values.get('velella:workspace'),'existing-workspace');assert.equal(values.get('velella:draft:session:file'),'draft')});
+test('malformed and wrong-type preferences fall back',()=>{for(const raw of ['{broken','null','{}','"false"','42']){globalThis.localStorage={getItem:()=>raw};assert.equal(readPreference('velella:ui:left-open',true),true)}});
+test('unavailable storage does not prevent a usable interface',()=>{globalThis.localStorage={getItem(){throw Error('denied')},setItem(){throw Error('quota')}};assert.equal(readPreference('theme','dark'),'dark');assert.doesNotThrow(()=>writePreference('theme','light'))});

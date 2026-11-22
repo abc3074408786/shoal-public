@@ -1,0 +1,42 @@
+{
+  "repository": "https://github.com/bmad-code-org/BMAD-METHOD",
+  "commit": "a867e1604b365d48ea03cbd109da1066ba0c84bc",
+  "channel": "preview",
+  "module_versions": {
+    "core-tools": "6.13.0-next",
+    "method": "6.13.0-next"
+  },
+  "folders": [
+    "bmad",
+    "bmad-advanced-elicitation",
+    "bmad-agent-analyst",
+    "bmad-agent-architect",
+    "bmad-agent-dev",
+    "bmad-agent-pm",
+    "bmad-agent-po",
+    "bmad-agent-ux-designer",
+    "bmad-architecture",
+    "bmad-brainstorming",
+    "bmad-build",
+    "bmad-build-auto",
+    "bmad-code-review",
+    "bmad-customize",
+    "bmad-deep-recon",
+    "bmad-facilitate",
+    "bmad-forge-idea",
+    "bmad-ingest",
+    "bmad-party-mode",
+    "bmad-project-context",
+    "bmad-qa-generate-e2e-tests",
+    "bmad-retrospective",
+    "bmad-review",
+    "bmad-shard-pro",
+    "bmad-ux",
+    "bmad-walkthrough",
+    "bmod-core-tools",
+    "bmod-method"
+  ],
+  "upstream_files_modified": false,
+  "license": "LICENSE",
+  "trademark_notice": "TRADEMARK.md"
+}

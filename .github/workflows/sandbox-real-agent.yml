@@ -1,0 +1,111 @@
+name: Real model with Velella sandbox
+on:
+  workflow_dispatch:
+    inputs:
+      allow_device_login:
+        description: 'Authorize temporary device login and a real model task'
+        required: true
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  real-agent:
+    if: ${{ inputs.allow_device_login == true }}
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    env:
+      CARGO_PROFILE_DEV_DEBUG: '0'
+      CARGO_PROFILE_TEST_DEBUG: '0'
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify acceptance failure and cleanup handling without model login
+        run: python3 scripts/test-real-sandbox-agent.py
+      - name: Install prerequisites and actual Codex CLI
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y bubblewrap python3 libdbus-1-dev pkg-config
+          npm install --prefix "$RUNNER_TEMP/codex-package" @openai/codex@0.153.4
+          python3 - <<'PY'
+          import os, pathlib, subprocess
+          root = pathlib.Path(os.environ['RUNNER_TEMP']) / 'codex-package/node_modules'
+          candidates = [p for p in root.rglob('codex') if p.is_file() and 'x86_64-unknown-linux-musl' in p.parts]
+          if len(candidates) != 1:
+              raise SystemExit('Expected exactly one native Codex binary')
+          subprocess.run(['sudo', 'install', '-m', '755', str(candidates[0]), '/usr/local/bin/codex'], check=True)
+          PY
+          codex --version
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: sandbox-real-runtime-${{ runner.os }}-${{ hashFiles('Cargo.lock') }}
+      - name: Build runtime and start isolated device login
+        run: |
+          cargo build --locked -p velella --bin velella-runtime
+          mkdir -p "$RUNNER_TEMP/real-agent-evidence"
+          nohup python3 scripts/verify-real-sandbox-agent.py --runtime "$PWD/target/debug/velella-runtime" --output "$RUNNER_TEMP/real-agent-evidence" --allow-device-login --timeout 900 > "$RUNNER_TEMP/real-agent-driver.log" 2>&1 &
+          echo "$!" > "$RUNNER_TEMP/real-agent-driver.pid"
+          for attempt in $(seq 1 90); do
+            if test -f "$RUNNER_TEMP/real-agent-evidence/challenge.json"; then exit 0; fi
+            if test -f "$RUNNER_TEMP/real-agent-evidence/result.json"; then cat "$RUNNER_TEMP/real-agent-evidence/result.json"; exit 1; fi
+            sleep 1
+          done
+          echo 'Device challenge did not arrive within 90 seconds'
+          exit 1
+      - name: Publish only the short-lived login challenge
+        uses: actions/upload-artifact@v4
+        with:
+          name: real-agent-device-challenge
+          path: ${{ runner.temp }}/real-agent-evidence/challenge.json
+          retention-days: 1
+      - name: Wait for user login and actual isolated task
+        run: |
+          for attempt in $(seq 1 930); do
+            if test -f "$RUNNER_TEMP/real-agent-evidence/result.json"; then
+              python3 - <<'PY'
+          import json, os, pathlib
+          receipt = json.loads((pathlib.Path(os.environ['RUNNER_TEMP']) / 'real-agent-evidence/result.json').read_text())
+          print(json.dumps(receipt, indent=2))
+          raise SystemExit(0 if receipt['status'] == 'passed' else 1)
+          PY
+              exit $?
+            fi
+            sleep 1
+          done
+          exit 1
+      - name: Stop owned test and remove temporary login data
+        if: always()
+        run: |
+          if test -f "$RUNNER_TEMP/real-agent-driver.pid"; then
+            kill -TERM "$(cat "$RUNNER_TEMP/real-agent-driver.pid")" 2>/dev/null || true
+            for attempt in $(seq 1 20); do
+              if test -f "$RUNNER_TEMP/real-agent-evidence/result.json"; then break; fi
+              sleep 1
+            done
+          fi
+          python3 - <<'PY'
+          import os, pathlib, shutil
+          marker = pathlib.Path(os.environ['RUNNER_TEMP']) / 'real-agent-evidence/owned-root.txt'
+          if marker.exists():
+              root = pathlib.Path(marker.read_text())
+              if root.parent != pathlib.Path('/tmp') or not root.name.startswith('vl-real-'):
+                  raise SystemExit('Refusing an unexpected cleanup directory')
+              if root.is_symlink():
+                  raise SystemExit('Refusing a symlink cleanup directory')
+              if root.exists():
+                  shutil.rmtree(root)
+              if root.exists():
+                  raise SystemExit('Temporary test login directory remains')
+          PY
+      - name: Preserve receipt only (never credentials or transcripts)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: real-agent-sandbox-result
+          path: ${{ runner.temp }}/real-agent-evidence/result.json

@@ -1,0 +1,53 @@
+{
+  "admission": "inert",
+  "jobId": "product-design",
+  "kernel": [
+    "foundation",
+    "toolchain"
+  ],
+  "next": [
+    {
+      "action": "check",
+      "command": "foundation",
+      "required": true,
+      "role": "kernel"
+    },
+    {
+      "action": "resolve",
+      "command": "toolchain",
+      "required": true,
+      "role": "kernel"
+    },
+    {
+      "action": "route",
+      "command": "prism",
+      "required": true,
+      "role": "primary"
+    },
+    {
+      "action": "search",
+      "command": "design-system",
+      "required": false,
+      "role": "secondary"
+    }
+  ],
+  "planSha256": "0c238db647c03b245298986cd14adcaf3fa61fe18de9f4df87ada8c65f8241c1",
+  "primaryKnowledge": {
+    "action": "route",
+    "admission": "inert",
+    "command": "prism",
+    "id": "prism"
+  },
+  "query": "component UI polish: existing Velella desktop workbench navigation toolbar tabs responsive layout with existing design system",
+  "registrySha256": "9728e5cf6a74f78e7b89332295f205a5503e94633d24c62a32ed48698fe5349d",
+  "routeSha256": "135febea8efcda010ced439090a6d6b2c2a3f280aef161d2f70f7377e322eb01",
+  "schema": "design-pipeline.job-plan.v1",
+  "secondaries": [
+    {
+      "action": "search",
+      "admission": "reference-only",
+      "command": "design-system",
+      "id": "astryx"
+    }
+  ]
+}

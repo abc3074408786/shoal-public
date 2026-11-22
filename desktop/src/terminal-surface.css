@@ -1,0 +1,78 @@
+/* Controls share the existing tab bar; the output has no extra heading row. */
+.terminal-loading {position:absolute;inset:0;z-index:1;display:grid;place-content:center;background:var(--terminal-bg);color:var(--muted-foreground);font-size:13px;pointer-events:none;}
+.terminal-canvas[data-terminal-loading=true] {visibility:hidden;}
+.terminal-workbench .xterm .xterm-scrollable-element > .xterm-scrollbar > .xterm-slider {border-radius:999px;}
+.terminal-tab-actions {display:flex;align-items:center;flex:none;}
+.terminal-tab-actions:empty {display:none;}
+.wb-tabbar>.terminal-tab-actions {padding-inline:4px;}
+.terminal-toolbar-actions {display:flex;align-items:center;gap:3px;}
+.terminal-tab-actions .terminal-toolbar-actions button {
+  min-inline-size:24px;min-block-size:24px;padding:3px;border:0;border-radius:4px;
+  background:transparent;color:var(--muted-foreground);
+}
+.terminal-workbench .terminal-canvas {padding:4px;background:var(--terminal-bg);}
+.terminal-workbench .terminal-find {
+  position:static;flex:none;inline-size:auto;max-inline-size:none;
+  padding:6px 8px;margin:0;border:0;border-block-end:1px solid var(--border);border-radius:0;
+  background:var(--card);
+}
+.terminal-workbench .terminal-find input {flex:1;min-inline-size:0;}
+.terminal-workbench .terminal-status {padding-inline:8px;}
+.terminal-workbench .terminal-activity>header {padding-inline:8px;}
+.terminal-workbench .activity-list {padding-inline:8px;}
+.terminal-tab-actions .terminal-toolbar-actions :focus-visible {outline:2px solid var(--ring);outline-offset:-2px;}
+@media(hover:hover) and (pointer:fine) {
+  .terminal-tab-actions .terminal-toolbar-actions button:hover:not(:disabled) {background:var(--secondary);color:var(--foreground);}
+}
+
+/* Single-pane tabs share the native titlebar. Split panes retain their own tabs. */
+.workbench-a-shell {
+  --mist-canvas:light-dark(#ffffff,#232d2a);
+  --mist-chrome:light-dark(#ffffff,oklch(.22 .01 167));
+  --mist-border:light-dark(oklch(.83 .015 167),oklch(.34 .014 167));
+  --mist-accent:light-dark(oklch(.43 .09 157),oklch(.83 .095 162));
+}
+.ide-shell.workbench-a-shell .ide-main:has(>.wb-body .wb-panes:not(.is-split)>.wb-pane>.wb-terminal) {
+  padding-inline:4px;padding-block-start:4px;
+}
+.ide-shell.workbench-a-shell>.app-titlebar:has(.terminal-toolbar-actions) {
+  background:var(--mist-chrome);
+}
+.ide-shell.workbench-a-shell .wb-body:has(.wb-panes:not(.is-split)>.wb-pane>.wb-terminal) {
+  border:1px solid var(--mist-border);border-radius:4px;overflow:clip;
+}
+.ide-shell.workbench-a-shell .ide-main:has(>.wb-body .wb-panes:not(.is-split)>.wb-pane>.wb-terminal)>.ide-status {
+  margin-inline:-4px;margin-block-start:4px;
+}
+.ide-shell.workbench-a-shell .wb-panes.is-split:has(>.wb-pane>.wb-terminal) {
+  padding:4px;gap:4px;background:var(--background);
+}
+.ide-shell.workbench-a-shell .wb-panes.is-split>.wb-pane:has(>.wb-terminal) {
+  border:1px solid var(--mist-border);border-radius:4px;background:var(--mist-canvas);
+}
+.ide-shell.workbench-a-shell .wb-panes.is-split>.wb-pane.focused:has(>.wb-terminal) {
+  border-color:color-mix(in oklch,var(--mist-accent) 50%,var(--mist-border));
+}
+.ide-shell.workbench-a-shell :is(.workbench-tabbar,.wb-tabbar):has(.terminal-toolbar-actions) {
+  min-block-size:32px;padding-inline:4px;background:var(--mist-chrome);border-block-end-color:var(--mist-border);
+}
+.ide-shell.workbench-a-shell :is(.workbench-tabbar,.wb-tabbar):has(.terminal-toolbar-actions) .ide-tabs {
+  background:transparent;align-items:end;gap:4px;min-block-size:32px;
+}
+.ide-shell.workbench-a-shell :is(.workbench-tabbar,.wb-tabbar):has(.terminal-toolbar-actions) .ide-tab {
+  border:0;border-radius:4px 4px 0 0;min-block-size:28px;max-inline-size:230px;
+}
+.ide-shell.workbench-a-shell :is(.workbench-tabbar,.wb-tabbar):has(.terminal-toolbar-actions) .ide-tab.selected {
+  background:var(--mist-canvas);box-shadow:0 1px var(--mist-canvas);color:var(--foreground);
+}
+.ide-shell.workbench-a-shell :is(.workbench-tabbar,.wb-tabbar):has(.terminal-toolbar-actions) .ide-tab.selected>button[role=tab]>svg {
+  color:var(--mist-accent);
+}
+.ide-shell.workbench-a-shell>.app-titlebar>.workbench-tabbar .ide-tabs { align-items:center; }
+.ide-shell.workbench-a-shell>.app-titlebar>.workbench-tabbar .ide-tab { border-radius:6px; }
+.ide-shell.workbench-a-shell :is(.workbench-tabbar,.wb-tabbar):has(.terminal-toolbar-actions) .terminal-tab-actions {
+  align-self:center;
+}
+.ide-shell.workbench-a-shell .wb-terminal .terminal-activity {
+  background:var(--mist-chrome);border-color:var(--mist-border);
+}

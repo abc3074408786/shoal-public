@@ -1,0 +1,24 @@
+[project]
+name = "velella-computer-use"
+version = "0.1.0"
+description = "Velella 鱼群 Computer Use：本地 Windows 桌面观察与受控输入 MCP 服务"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "mcp>=1.9,<2",
+    "pillow>=11.0,<13",
+    "jsonschema>=4.20,<5",
+]
+
+[project.scripts]
+velella-computer-use = "velella_computer_use.server:main"
+
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/velella_computer_use"]
+
+[tool.uv]
+package = true

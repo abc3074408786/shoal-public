@@ -1,0 +1,30 @@
+/* Feedback only; never delay readiness or animate the content being loaded. */
+[data-loading-revealed=false]{visibility:hidden;}
+.loading-state{--loading-cycle:2.6s;--loading-drift-x:4px;--loading-drift-y:2px;display:flex;align-items:center;justify-content:center;color:var(--muted-foreground);font-size:12px;line-height:1.6;}
+.loading-state--panel{flex-direction:column;gap:18px;inline-size:100%;min-block-size:240px;padding:24px;}
+.loading-state--compact{--loading-drift-x:1.2px;--loading-drift-y:.6px;justify-content:flex-start;gap:8px;min-block-size:32px;font-size:11px;}
+.loading-state--compact>span{white-space:nowrap;}
+.loading-school{position:relative;flex:none;inline-size:108px;block-size:108px;color:var(--foreground);}
+.loading-state--compact .loading-school{inline-size:32px;block-size:32px;}
+.loading-fish{position:absolute;inset:0;display:block;background:currentColor;mask-image:var(--fish-mark);mask-size:contain;mask-repeat:no-repeat;mask-position:center;}
+.loading-fish--lead{clip-path:polygon(20% 40%,47% 41%,75% 16%,90% 18%,89% 34%,65% 42%,45% 48%,25% 62%,21% 57%);}
+.loading-fish--middle{clip-path:polygon(18% 61%,38% 61%,47% 50%,67% 43%,71% 44%,65% 61%,50% 64%,20% 79%,18% 75%);}
+.loading-fish--rear{clip-path:polygon(40% 65%,75% 50%,82% 52%,77% 77%,58% 85%,39% 80%);}
+.loading-current{position:absolute;inline-size:14.815%;block-size:1px;background:currentColor;opacity:.12;transform:rotate(-30deg);border-radius:1px;}
+.loading-current--one{inset-inline-start:2.778%;inset-block-start:49.074%;}
+.loading-current--two{inset-inline-start:13.889%;inset-block-start:74.074%;inline-size:9.259%;}
+.shell-loading{display:grid;place-items:center;flex:1;min-block-size:0;}
+.shell-loading-error{display:flex;flex-direction:column;align-items:center;gap:12px;max-inline-size:440px;padding:24px;text-align:center;}
+.file-editor-loading.loading-state{flex:1;}
+@media(prefers-reduced-motion:no-preference){
+  .loading-fish{animation:velella-school-swim var(--loading-cycle) ease-in-out infinite;}
+  .loading-fish--middle{animation-delay:-.35s;}
+  .loading-fish--rear{animation-delay:-.7s;}
+  .loading-current{animation:velella-school-current var(--loading-cycle) ease-in-out infinite;}
+  .loading-current--two{animation-delay:-.45s;}
+  .loading-icon{animation:velella-loading-turn 1s linear infinite;}
+  :is([hidden],[inert],[data-loading-revealed=false]) :is(.loading-fish,.loading-current,.loading-icon){animation-play-state:paused;}
+}
+@keyframes velella-school-swim{0%,100%{transform:translate(calc(-1 * var(--loading-drift-x)),var(--loading-drift-y)) rotate(-1deg);}50%{transform:translate(var(--loading-drift-x),calc(-1 * var(--loading-drift-y))) rotate(1deg);}}
+@keyframes velella-school-current{0%,100%{opacity:.08;transform:translate(0,0) rotate(-30deg);}50%{opacity:.2;transform:translate(calc(-1.25 * var(--loading-drift-x)),calc(1.5 * var(--loading-drift-y))) rotate(-30deg);}}
+@keyframes velella-loading-turn{to{transform:rotate(1turn);}}

@@ -1,0 +1,11 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import vm from 'node:vm';
+import ts from 'typescript';
+function load(name,dependencies={}){const module={exports:{}};vm.runInNewContext(ts.transpileModule(readFileSync(new URL('../src/'+name+'.ts',import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,{module,exports:module.exports,require:name=>dependencies[name]});return module.exports}
+const catalog=load('agent-preferences'),{isAgentSession,partitionSessionHistory,filterSessionHistory}=load('session-history',{'./agent-preferences':catalog});
+const records=[...Array.from({length:19},(_,i)=>({id:'shell-'+i,title:'PowerShell',program:'powershell',kind:'terminal'})),...Array.from({length:9},(_,i)=>({id:'codex-'+i,title:'Codex',program:'codex',kind:'terminal'})),{id:'claude-0',title:'Claude',program:'claude',kind:'terminal'},{id:'claude-1',title:'Claude',program:'claude',kind:'terminal'},{id:'zcode-0',title:'ZCode',program:'zcode-free',kind:'terminal'},{id:'zcode-1',title:'ZCode',program:'zcode-free',kind:'terminal'}];
+test('32 saved records do not become 32 current terminals',()=>{const result=partitionSessionHistory(records,[]);assert.equal(result.current.length,0);assert.equal(result.history.length,32);assert.equal(filterSessionHistory(result.history,'agents').length,13);assert.equal(filterSessionHistory(result.history,'shells').length,19)});
+test('current tabs and split leaves partition records without deleting or duplicating them',()=>{const result=partitionSessionHistory(records,['shell-1','shell-1','codex-0']);assert.deepEqual(Array.from(result.current,s=>s.id),['shell-1','codex-0']);assert.equal(result.history.length,30);assert.equal(records.length,32);assert.equal(result.history.some(s=>s.id==='shell-1'),false)});
+test('history uses insertion recency and searchable identity without mutating the source',()=>{assert.equal(filterSessionHistory(records,'agents')[0].id,'zcode-1');assert.equal(filterSessionHistory(records,'agents','CODEX-8')[0].id,'codex-8');assert.equal(records[0].id,'shell-0');assert.equal(isAgentSession({kind:'terminal',program:'zcode-api'}),true)});

@@ -1,0 +1,101 @@
+/* Motion vocabulary adapted from OpenCLI Admin (Apache-2.0).
+ * Keep the accepted Orca geometry; CSS owns only control and overlay feedback.
+ * No timers, layout animation, terminal transitions, or permanent compositor hints.
+ */
+:root {
+  --motion-duration-press: 70ms;
+  --motion-duration-response: 180ms;
+  --motion-duration-exit: 120ms;
+  --motion-duration-dialog: 240ms;
+  --motion-ease-force-in: cubic-bezier(0.4, 0, 1, 1);
+  --motion-ease-spatial: cubic-bezier(0.32, 0.72, 0, 1);
+  --motion-ease-settle: cubic-bezier(0.34, 1.36, 0.64, 1);
+}
+
+/* Opt in: reduced-motion users get the original immediate state changes. */
+@media (prefers-reduced-motion: no-preference) {
+  .ui-button,
+  .wb-folder summary {
+    transition:
+      background-color var(--motion-duration-response) var(--motion-ease-spatial),
+      border-color var(--motion-duration-response) var(--motion-ease-spatial),
+      color var(--motion-duration-response) var(--motion-ease-spatial),
+      opacity var(--motion-duration-response) var(--motion-ease-spatial),
+      transform var(--motion-duration-response) var(--motion-ease-settle);
+  }
+
+  .ui-button:active:not(:disabled):not([aria-disabled="true"]) {
+    transform: translateY(1px) scale(0.985);
+    transition-duration: var(--motion-duration-press);
+    transition-timing-function: var(--motion-ease-force-in);
+  }
+
+  /* OS chrome must remain a stationary pointer target. */
+  .window-controls .ui-button,
+  .window-controls .ui-button:active:not(:disabled):not([aria-disabled="true"]) {
+    transform: none;
+    transition: background-color var(--motion-duration-response) var(--motion-ease-spatial);
+  }
+
+  .wb-menu-panel {
+    transform-origin: var(--radix-dropdown-menu-content-transform-origin, var(--radix-context-menu-content-transform-origin, center));
+  }
+
+  .wb-menu-panel[data-state="open"] {
+    animation: velella-menu-in var(--motion-duration-response) var(--motion-ease-spatial);
+  }
+
+  .wb-menu-panel[data-state="closed"] {
+    animation: velella-menu-out var(--motion-duration-exit) var(--motion-ease-spatial);
+    pointer-events: none;
+  }
+
+  .ui-tooltip[data-state="delayed-open"],
+  .ui-tooltip[data-state="instant-open"],
+  .ui-overlay[data-state="open"],
+  dialog[open]::backdrop {
+    animation: velella-fade-in var(--motion-duration-response) var(--motion-ease-spatial);
+  }
+
+  .ui-tooltip[data-state="closed"],
+  .ui-overlay[data-state="closed"] {
+    animation: velella-fade-out var(--motion-duration-exit) var(--motion-ease-spatial);
+    pointer-events: none;
+  }
+
+  /* Native close stays immediate: never delay focus return or a dialog action. */
+  dialog[open],
+  .ui-dialog[data-state="open"] {
+    animation: velella-dialog-in var(--motion-duration-dialog) var(--motion-ease-spatial);
+  }
+
+  .ui-dialog[data-state="closed"] {
+    animation: velella-fade-out var(--motion-duration-exit) var(--motion-ease-spatial);
+    pointer-events: none;
+  }
+
+  .terminal-find {
+    animation: velella-menu-in var(--motion-duration-response) var(--motion-ease-spatial);
+  }
+}
+
+@keyframes velella-menu-in {
+  from { opacity: 0; translate: 0 -4px; scale: 0.985; }
+  to { opacity: 1; translate: 0 0; scale: 1; }
+}
+@keyframes velella-menu-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes velella-dialog-in {
+  from { opacity: 0; translate: 0 6px; scale: 0.99; }
+  to { opacity: 1; translate: 0 0; scale: 1; }
+}
+@keyframes velella-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes velella-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}

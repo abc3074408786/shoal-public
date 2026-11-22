@@ -1,0 +1,21 @@
+name: nightly
+on:
+  schedule:
+    - cron: "0 3 * * *" # 03:00 UTC daily
+  workflow_dispatch: {}
+
+jobs:
+  compat:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo test --workspace
+      # live probes: no agent CLIs on GitHub runners, so claude checks
+      # skip themselves; pty-echo and fixture replay run everywhere.
+      # Self-hosted runners with real CLIs get the full battery.
+      - run: cargo run -p velella -- compat

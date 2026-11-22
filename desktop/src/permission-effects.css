@@ -1,0 +1,23 @@
+.permission-details{min-inline-size:0;font-size:11px;}
+.permission-details dl{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;margin:0;padding-block:8px;}
+.permission-details dl>div{display:grid;grid-template-columns:70px minmax(0,1fr);gap:12px;line-height:1.6;}
+.permission-details dt{color:var(--muted-foreground);}
+.permission-details dd{margin:0;color:var(--foreground);overflow-wrap:anywhere;text-align:start;}
+.permission-recipe{border-block-start:1px solid var(--border);padding-block-start:8px;margin-block-start:4px;}
+.permission-recipe summary,.permission-row-details>summary{cursor:pointer;font-size:11px;color:var(--muted-foreground);padding-block:5px;}
+.permission-recipe code{display:block;padding:10px;margin-block:6px;border-radius:6px;background:var(--background);white-space:pre-wrap;overflow-wrap:anywhere;font-family:var(--font-mono);font-size:11px;}
+.permission-recipe p,.permission-launch-field>p{font-size:11px;line-height:1.6;color:var(--muted-foreground);margin:0;}
+.permission-launch-field{display:grid;gap:8px;margin-block-start:16px;padding:14px;border:1px solid var(--border);border-radius:10px;background:var(--card);}
+.permission-launch-field>label{font-size:12px;font-weight:550;}
+.permission-launch-field>select{inline-size:100%;min-block-size:34px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--background);color:var(--foreground);font-size:12px;}
+.permission-launch-field select:focus-visible,.permission-recipe summary:focus-visible,.permission-row-details>summary:focus-visible{outline:2px solid var(--ring,var(--primary));outline-offset:2px;}
+.permission-launch-field select:active,.permission-recipe summary:active,.permission-row-details>summary:active{color:var(--primary);}
+.permission-row-details{grid-column:1/-1;}
+.permission-default-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-block-end:10px;}
+.permission-default-heading h4{margin:0;font-size:12px;}
+.permission-default-heading>span{font-size:10px;color:var(--muted-foreground);}
+.permission-exceptions{font-size:11px;color:var(--muted-foreground);margin-block-end:14px;line-height:1.6;}
+.agent-terminal-launcher{inline-size:min(560px,calc(100vw - 32px));}
+.agent-terminal-launcher .dialog-body{max-block-size:calc(100dvh - 220px);overflow:auto;}
+.permission-source-label{font-size:10px;color:var(--muted-foreground);font-weight:400;display:block;margin-block-start:3px;}
+@media(hover:hover) and (pointer:fine){.permission-recipe summary:hover,.permission-row-details>summary:hover{color:var(--foreground);}}

@@ -1,0 +1,22 @@
+.terminal-activity{flex:0 1 auto;min-block-size:0;max-block-size:45%;display:flex;flex-direction:column;border-block-end:1px solid var(--border);background:var(--background);color:var(--foreground);font-size:12px}
+.terminal-activity>header{display:flex;align-items:center;gap:8px;padding:4px 42px 4px 8px;flex:none}
+.terminal-activity>header>.ui-button{display:inline-flex;align-items:center;gap:5px;font-weight:600}
+.activity-current{flex:1;min-inline-size:0;overflow:clip;text-overflow:ellipsis;white-space:nowrap;color:var(--muted-foreground)}
+.activity-list{min-block-size:0;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;padding-inline:12px;padding-block-end:8px;max-block-size:clamp(140px,30vh,320px)}
+.activity-item{border-block-start:1px solid var(--border)}
+.activity-item>summary{display:flex;align-items:baseline;gap:8px;padding-block:9px;cursor:pointer;list-style:none}
+.activity-item>summary::-webkit-details-marker{display:none}
+.activity-item>summary>svg{flex:none;align-self:center;color:var(--muted-foreground)}
+.activity-item.returned>summary>svg{color:var(--status-success)}
+.activity-item.failed>summary>svg{color:var(--danger)}
+.activity-title{flex:1;min-inline-size:0;overflow-wrap:anywhere}
+.activity-state{flex:none;font-size:11px;color:var(--muted-foreground)}
+.activity-item.running .activity-state,.activity-item.waiting .activity-state{color:var(--foreground);font-weight:600}
+.activity-item>summary:focus-visible{outline:2px solid var(--ring);outline-offset:2px}
+.activity-item>summary:active{background:var(--muted)}
+@media (hover:hover) and (pointer:fine){.activity-item>summary:hover{background:var(--muted)}}
+.activity-detail{padding-block:0 12px;padding-inline-start:22px;display:flex;flex-direction:column;gap:6px}
+.activity-detail pre{font:11px/1.6 var(--font-mono);white-space:pre-wrap;overflow-wrap:anywhere;margin:0;padding:8px;background:var(--muted);max-block-size:240px;overflow:auto}
+.activity-note,.activity-detail>small,.activity-detail>p{color:var(--muted-foreground);line-height:1.6;overflow-wrap:anywhere}
+.activity-note{margin-block:8px}
+.activity-list>footer{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;color:var(--muted-foreground);font-size:11px;padding-block-start:8px}

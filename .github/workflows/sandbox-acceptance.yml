@@ -1,0 +1,23 @@
+name: sandbox-acceptance
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  linux-sandbox:
+    # Deliberately explicit: this runner must permit user/PID/network namespaces.
+    # The workflow never changes sysctl/AppArmor settings to force a pass.
+    runs-on: [self-hosted, linux, velella-sandbox]
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify acceptance receipt behavior
+        run: python3 scripts/test-verify-sandbox.py
+      - name: Verify kernel isolation and task policy
+        run: python3 scripts/verify-sandbox.py
+      - name: Preserve acceptance receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sandbox-acceptance
+          path: artifacts/sandbox-acceptance/

@@ -1,0 +1,109 @@
+.project-layout-options{display:flex;flex-direction:column;flex:1;min-block-size:0;min-inline-size:0;color:var(--foreground)}
+.layout-comparison-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;min-block-size:48px;padding-inline:14px;border-block-end:1px solid var(--border);flex:none}
+.layout-comparison-bar>div{display:flex;gap:3px;padding:3px;background:var(--secondary);border-radius:7px}
+.layout-comparison-bar button{border:0;min-block-size:30px;padding:5px 12px;background:transparent;font-size:12px;font-weight:400;color:var(--muted-foreground)}
+.project-shell .layout-comparison-bar button[aria-pressed=true]{background:var(--card);color:var(--foreground);box-shadow:0 1px 3px oklch(0% 0 none / .08)}
+.layout-comparison-bar small{font-size:10px;color:var(--muted-foreground);white-space:nowrap}
+.layout-project-switcher{display:flex;flex:none;overflow-x:auto;min-block-size:48px;padding-inline:14px;gap:8px;border-block-end:1px solid var(--border)}
+.layout-project-switcher button{display:flex;align-items:center;gap:8px;flex:none;min-block-size:48px;max-inline-size:240px;padding-inline:12px;border:0;border-radius:0;background:transparent;color:var(--muted-foreground);font-size:12px;font-weight:400}
+.project-shell .layout-project-switcher button[aria-current=page]{background:var(--secondary);color:var(--foreground);box-shadow:inset 0 -2px var(--foreground)}
+.layout-project-switcher button>span,.layout-column-heading>span{overflow:clip;text-overflow:ellipsis;white-space:nowrap;min-inline-size:0}
+.layout-project-switcher button>svg,.layout-column-heading>svg{flex:none}
+.layout-project-board{display:flex;flex:1;min-block-size:0;min-inline-size:0;overflow-x:auto;overscroll-behavior-inline:contain}
+.layout-project-column{display:flex;flex-direction:column;flex:1;min-inline-size:0;min-block-size:0;overflow:clip}
+[data-layout=columns] .layout-project-column{flex:1 0 320px;border-inline-end:1px solid var(--border)}
+[data-layout=columns] .layout-project-column:last-child{border-inline-end:0}
+.layout-column-heading{display:flex;align-items:center;gap:8px;min-block-size:42px;padding-inline:14px;border-block-end:1px solid var(--border);color:var(--muted-foreground);font-size:12px;flex:none}
+.layout-column-heading small{font-size:10px;overflow:clip;text-overflow:ellipsis;white-space:nowrap}
+.layout-project-column[data-focused=true]>.layout-column-heading{color:var(--foreground);background:var(--secondary)}
+.layout-project-column .layout-column-tools{min-block-size:36px;padding-inline:8px}
+.layout-project-column .project-tools{max-inline-size:100%;overflow-x:auto}
+.layout-project-column .chrome-workspace-name{display:none}
+[data-layout=columns] .chrome-actions>.terminal-tab-actions{display:none}
+[data-layout=columns] .project-tools .chrome-actions button{min-inline-size:28px}
+.layout-project-column .wb-body{min-inline-size:0}
+.layout-comparison-bar button:active,.layout-project-switcher button:active{background:var(--secondary);color:var(--foreground)}
+.project-layout-options button:focus-visible{outline:2px solid var(--foreground);outline-offset:-2px}
+@media(hover:hover) and (pointer:fine){.layout-comparison-bar button:hover,.layout-project-switcher button:hover{background:var(--secondary);color:var(--foreground)}}
+
+/* Selected direction: two quiet rows, with the terminal taking the remaining space. */
+.ide-shell.project-shell .layout-project-switcher{min-block-size:54px;padding-inline:20px;gap:20px;border:0}
+.ide-shell.project-shell .layout-project-switcher button{position:relative;min-block-size:54px;padding-inline:0;gap:7px;border:0;background:transparent;color:var(--muted-foreground);box-shadow:none;max-inline-size:240px}
+.ide-shell.project-shell .layout-project-switcher button[aria-current=page]{color:var(--foreground);background:transparent;font-weight:550;box-shadow:none}
+.layout-project-switcher button[aria-current=page]::after{content:'';position:absolute;inset-inline:0;inset-block-end:6px;block-size:2px;border-radius:2px;background:var(--foreground)}
+.ide-shell.project-shell .layout-project-switcher[hidden]{display:none}
+.ide-shell.project-shell .layout-project-bar-toggle{display:grid;place-items:center;flex:none;min-inline-size:28px;inline-size:28px;min-block-size:30px;padding:0;border:0;border-radius:6px;color:var(--muted-foreground);background:transparent}
+.layout-terminal-bar{position:relative;display:flex;align-items:center;gap:8px;min-block-size:36px;padding-inline:8px;flex:none;z-index:2}
+.ide-shell.project-shell .layout-terminal-bar .shell-page-chrome{flex:1;min-inline-size:0;min-block-size:32px;block-size:auto;border:0;background:transparent}
+.ide-shell.project-shell .layout-terminal-bar .shell-page-chrome .ide-tabs{min-block-size:32px;gap:4px}
+.ide-shell.project-shell .layout-terminal-bar .ide-tab{min-inline-size:96px;max-inline-size:220px;min-block-size:30px;border:0;border-radius:6px;background:transparent;box-shadow:none;color:var(--muted-foreground)}
+.ide-shell.project-shell .layout-terminal-bar .ide-tab.selected{background:var(--secondary);color:var(--foreground);box-shadow:none;border:0}
+.ide-shell.project-shell .layout-terminal-bar .shell-page-chrome .ide-tab>button{min-block-size:30px;block-size:30px;border-radius:6px;background:transparent}
+.ide-shell.project-shell .layout-terminal-bar .ide-tab>button:first-child{padding-inline:10px;font-size:12px}
+.layout-terminal-bar .ide-tab>button:last-child{opacity:0}
+.layout-terminal-bar .ide-tab.selected>button:last-child,.layout-terminal-bar .ide-tab:focus-within>button:last-child{opacity:1}
+.layout-terminal-bar .project-tools{overflow:visible;flex:none;margin-inline-start:0}
+.layout-project-column>.wb-body{margin-block:0 4px;margin-inline:4px;border:1px solid var(--border);border-radius:4px;overflow:clip}
+.project-layout-options[data-layout=tabs] .layout-project-board,.project-layout-options[data-layout=tabs] .layout-project-column{overflow:visible}
+.project-shell .compact-workbench-toolbar{gap:3px}
+.project-shell .compact-workbench-toolbar button,.workbench-toolbar-overflow>summary{min-inline-size:30px;min-block-size:30px;border:0;border-radius:6px;color:var(--muted-foreground);background:transparent}
+.workbench-toolbar-overflow{position:relative;border:0;font-size:12px}
+.workbench-toolbar-overflow>summary{display:grid;place-items:center;cursor:pointer;padding:0;list-style:none}
+.workbench-toolbar-overflow>summary::-webkit-details-marker{display:none}
+.workbench-toolbar-overflow>summary:focus-visible{outline:2px solid var(--foreground);outline-offset:-2px}
+.workbench-toolbar-overflow[open]>summary{background:var(--secondary);color:var(--foreground)}
+.workbench-toolbar-panel{position:absolute;inset-inline-end:0;inset-block-start:calc(100% + 7px);inline-size:228px;max-block-size:min(60dvh,500px);overflow-y:auto;padding:6px;background:var(--card);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px oklch(0% 0 none / .1);z-index:30}
+.workbench-toolbar-panel:empty{display:none}
+.workbench-toolbar-panel .terminal-tab-actions,.workbench-toolbar-panel .terminal-toolbar-actions,.workbench-toolbar-panel .terminal-split-actions{display:contents}
+.ide-shell.project-shell .workbench-toolbar-panel button{display:flex;align-items:center;justify-content:flex-start;gap:10px;inline-size:100%;min-block-size:34px;padding:7px 10px;color:var(--foreground);font-size:12px}
+.workbench-toolbar-panel button[aria-label]::after{content:attr(aria-label);white-space:nowrap}
+.ide-shell.project-shell .project-layout-options .ui-button:active:not(:disabled),.workbench-toolbar-overflow>summary:active{background:var(--secondary);color:var(--foreground);transform:none}
+html:has(.project-layout-options[data-layout=tabs]) .ui-button{transform:none;transition:none}
+html:has(.project-layout-options[data-layout=tabs]) .ui-button:active:not(:disabled):not([aria-disabled=true]){background:var(--secondary);color:var(--foreground);transform:none;transition:none}
+/* Radix positions the outer portal; its content must participate in measurement. */
+html:has(.project-layout-options) .wb-menu-panel{position:relative;inset-block-start:auto;inset-inline:auto;background:var(--card);color:var(--foreground);border-color:var(--border);box-shadow:0 8px 24px oklch(0% 0 none / .12)}
+html:has(.project-layout-options) .wb-menu-panel [data-highlighted]{background:var(--secondary);color:var(--foreground)}
+@media(hover:hover) and (pointer:fine){
+  .ide-shell.project-shell .layout-project-switcher button:hover:not(:disabled){background:transparent;color:var(--foreground)}
+  .ide-shell.project-shell .layout-terminal-bar button:hover:not(:disabled),.workbench-toolbar-overflow>summary:hover{background:var(--secondary);color:var(--foreground)}
+  .layout-terminal-bar .ide-tab:hover>button:last-child{opacity:1}
+}
+@media(prefers-reduced-motion:no-preference){
+  html:has(.project-layout-options[data-layout=tabs]) .wb-menu-panel[data-state=open],html:has(.project-layout-options[data-layout=tabs]) .workbench-toolbar-panel{animation:project-tool-fade-in 130ms cubic-bezier(.2,.8,.2,1)}
+  html:has(.project-layout-options[data-layout=tabs]) .wb-menu-panel[data-state=closed]{animation:project-tool-fade-out 90ms cubic-bezier(.2,.8,.2,1)}
+  html:has(.project-layout-options[data-layout=tabs]) dialog[open],html:has(.project-layout-options[data-layout=tabs]) .ui-dialog[data-state=open],html:has(.project-layout-options[data-layout=tabs]) .terminal-find{animation:project-tool-fade-in 160ms cubic-bezier(.2,.8,.2,1)}
+}
+@media(prefers-reduced-motion:reduce){
+  html:has(.project-layout-options) :is(.ui-button,.wb-menu-panel,.ui-tooltip,.ui-dialog,.ui-overlay,.terminal-find,dialog,.workbench-toolbar-panel){animation:none;transition:none}
+}
+@keyframes project-tool-fade-in{from{opacity:0}to{opacity:1}}
+@keyframes project-tool-fade-out{from{opacity:1}to{opacity:0}}
+
+/* Project context stays beside existing live tabs; it does not own session state. */
+.project-workspace .layout-terminal-bar { gap: 8px; min-block-size: 36px; padding-inline: 8px; border-block-end: 1px solid var(--border); }
+.project-workspace-identity { display: flex; align-items: center; gap: 12px; min-inline-size: 0; }
+.ide-shell.project-shell .project-workspace .layout-project-bar-toggle { display: flex; align-items: center; gap: 8px; inline-size: auto; max-inline-size: 230px; padding-inline: 8px; min-block-size: 32px; color: var(--foreground); }
+.project-workspace .layout-project-bar-toggle strong { font-size: 13px; font-weight: 600; overflow: clip; text-overflow: ellipsis; white-space: nowrap; }
+.project-workspace .layout-project-bar-toggle svg { flex: none; }
+.project-workspace-path { max-inline-size: 280px; font-size: 12px; color: var(--muted-foreground); white-space: nowrap; text-overflow: ellipsis; overflow: clip; }
+.project-workspace .layout-terminal-bar:has(.ide-tabs) .project-workspace-path { display: none; }
+.project-workspace .layout-terminal-bar:has(.ide-tabs) .project-workspace-identity { flex: 0 1 auto; max-inline-size: 190px; }
+.project-workspace .layout-terminal-bar .project-tools { margin-inline-start: auto; }
+.project-workspace .project-tools .workspace-session-history,
+.project-workspace .project-tools .workspace-tools-toggle { gap: 6px; padding-inline: 9px; font-size: 12px; }
+.project-workspace .project-tools .workspace-session-history::after { content: '会话'; }
+.project-workspace .project-tools .workspace-tools-toggle::after { content: '工具'; }
+.project-workspace .layout-project-column > .wb-body { margin: 0; border: 0; border-radius: 0; }
+.project-workspace .wb-files { border-inline-start: 1px solid var(--border); }
+.project-workspace .right-panel-tabs { min-block-size: 42px; padding-inline: 10px; gap: 6px; }
+.project-workspace .right-panel-tabs > button { min-block-size: 30px; padding-inline: 10px; border-radius: 6px; font-size: 12px; }
+@media (width < 900px) {
+  .project-workspace-path { display: none; }
+  .project-workspace .layout-terminal-bar { gap: 6px; padding-inline: 8px; }
+  .project-workspace .layout-terminal-bar:has(.ide-tabs) .project-workspace-identity { max-inline-size: 120px; }
+}
+@media (width < 560px) {
+  .project-workspace .project-tools .workspace-session-history::after,
+  .project-workspace .project-tools .workspace-tools-toggle::after { content: none; }
+  .project-workspace .layout-project-bar-toggle strong { max-inline-size: 100px; }
+}

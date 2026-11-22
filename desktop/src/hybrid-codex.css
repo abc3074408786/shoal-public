@@ -1,0 +1,23 @@
+.hybrid-approvals {
+  flex: none;
+  min-inline-size: 0;
+  max-block-size: 45dvh;
+  padding-block: .5rem;
+  padding-inline: .75rem;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border-block-end: 1px solid var(--stroke);
+  background: var(--surface-page);
+  color: var(--ink);
+}
+.hybrid-approvals pre {
+  max-block-size: 7rem;
+  background: var(--surface-inset);
+  color: var(--ink);
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  overflow: auto;
+}
+.hybrid-approvals summary { cursor: pointer; }
+.hybrid-approvals summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.hybrid-approvals summary:active { text-decoration: underline; }

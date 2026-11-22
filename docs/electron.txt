@@ -1,0 +1,67 @@
+Electron desktop migration (2026-10-21)
+
+Build and run
+  cargo build --release --bin velella-runtime
+  cd desktop
+  npm ci
+  npm run build
+  npm start
+  npm test
+  npm run test:electron
+  npm run package
+
+The default desktop entry is Electron 44.9.2, packaged with electron-builder
+26.15.3. npm run dev remains a Vite preview. The old npm run tauri path remains
+available for rollback; renderer imports go through src/desktop-platform.ts.
+
+Architecture
+  Electron main: windows, native dialogs/clipboard/notifications, browser views.
+  Sandboxed preload: fixed IPC commands; no raw IPC or Node in the renderer.
+  React/xterm: the existing interface, terminal input/output and file editor.
+  Rust daemon/session hosts: actual PTYs, native CLI agents and tool sandbox.
+  Closing/hiding/quitting the GUI does not stop the daemon or terminal hosts.
+
+The main renderer uses contextIsolation, sandbox and nodeIntegration=false,
+a production CSP, and exact main-frame sender validation. Remote browser tabs
+are separate WebContentsViews with workspace profiles and no preload. They
+cannot access the desktop bridge. Browser automation uses bounded main-process
+CDP operations and isolated annotation worlds, not a public debugging port.
+
+Both daemon and browser control use the native owner-only IPC implementation.
+Electron's desktop-bridge child relays browser JSON over private stdio. It is
+separate from the daemon and dies when its parent closes stdin. Windows pipe
+names come from the Rust ipc-endpoint command; terminal polling and input use
+direct pipes, not a newly spawned CLI for each keystroke. Ambiguous mutations
+are never automatically replayed.
+
+Packaging
+  Linux: AppImage and linux-unpacked directory.
+  Windows: NSIS configuration; build Rust and Electron on Windows.
+  macOS: DMG configuration; build Rust and Electron on macOS.
+  Cross-OS/CPU packaging is rejected to avoid bundling the wrong Rust binary.
+  Windows/macOS installation, signing, permissions, PTYs and sandbox acceptance
+  still require real target-machine tests. Electron does not make the Linux
+  Landlock/seccomp sandbox portable by itself.
+
+Migration boundaries
+  Projects, workspaces, layout and terminal sessions remain in the existing
+  Velella data directory. Existing PTYs continue under their original hosts.
+  Electron uses a new Chromium profile; prior Tauri browser logins and local
+  frontend preferences are not copied. Browser page records remain available.
+  The Electron browser MCP adapter exposes list/snapshot/click/fill/screenshot,
+  wait_for, console-message and network-request tools. Network inspection is
+  bounded metadata (URL/method/status/MIME), without headers or bodies. It does
+  not expose the previous raw agent_endpoint for the privileged application.
+  Native annotation preview/prepare/send/receipt uses runtime feedback.
+  Browser MCP still requires Node.js on PATH, as did the previous adapter.
+
+Evidence is stored in artifacts/electron-20261021. Passing Linux tests is not
+Windows/macOS acceptance or complete feature equivalence with Orca.
+
+Linux acceptance: 96 unit tests and 26 Electron integration checks passed.
+Installed directory: /home/admin/.local/share/shoal/electron-0.2.0-20261021-093419
+Rollback backup: /home/admin/.local/share/shoal/backups/electron-migration-20261021-093419
+This host lacks libfuse.so.2; the unpacked build is installed and verified.
+The AppImage builds successfully but direct AppImage startup is not usable
+on this host until FUSE support is installed. WebGL2 is blocklisted by the
+host GPU driver; the existing terminal renderer uses its fallback.

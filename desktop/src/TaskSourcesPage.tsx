@@ -1,0 +1,68 @@
+import {useEffect,useRef,useState} from 'react';
+import {ExternalLink,FolderGit2,Plus,RefreshCw,Search,Settings2,Inbox,SearchX,AlertCircle,Link2,MoreHorizontal,Copy,X,PanelRight} from 'lucide-react';
+import {Project,rpc} from './api';
+import {Button,Input} from './ui';
+import {useConfirm} from './ConfirmAction';
+import {Provider,providers,SourceItem,SourceLink,TaskSource,RepositorySource,openSourceUrl,taskPrompt} from './task-sources';
+import TaskSourceSettings from './TaskSourceSettings';
+import SourceTaskCreate from './SourceTaskCreate';
+import SourceTaskActivity from './SourceTaskActivity';
+import SourceTaskBody from './SourceTaskBody';
+import SourceTaskInfo,{sourceDate} from './SourceTaskInfo';
+import ActionMenu from './ActionMenu';
+import './task-sources.css';
+import './task-console.css';
+
+export default function TaskSourcesPage({projects,links,initialKey,onStart,onOpen}:{projects:Project[];links:SourceLink[];initialKey?:string;onStart:(item:SourceItem)=>void;onOpen:(id:string)=>void}){
+  const ask=useConfirm();
+  const [sources,setSources]=useState<TaskSource[]>([]),[provider,setProvider]=useState<Provider>('github'),[sourceId,setSourceId]=useState('');
+  const [repositories,setRepositories]=useState<RepositorySource[]>([]),[choices,setChoices]=useState<{id:string;name:string}[]>([]),[scopes,setScopes]=useState<string[]>([]);
+  const [items,setItems]=useState<SourceItem[]>([]),[selected,setSelected]=useState<SourceItem|null>(null),[next,setNext]=useState<string|null>(null),[query,setQuery]=useState(''),[search,setSearch]=useState(''),[state,setState]=useState('open');
+  const [busy,setBusy]=useState(false),[detailBusy,setDetailBusy]=useState(false),[error,setError]=useState(''),[status,setStatus]=useState(''),[settings,setSettings]=useState<TaskSource|'new'|null>(null),[creating,setCreating]=useState(false);
+  const generation=useRef(0),detailGeneration=useRef(0),loading=useRef(false);
+  const source=sources.find(s=>s.id===sourceId),available=sources.filter(s=>s.provider===provider),linked=selected?links.find(l=>l.key===selected.key):undefined;
+  async function refreshSources(sync=false){const r=await rpc({cmd:sync?'sources.sync':'sources.list'});setSources(r.sources);if(r.repositories)setRepositories(r.repositories);return r.sources as TaskSource[]}
+  useEffect(()=>{let live=true;void refreshSources(true).then(async list=>{
+    if(!live)return;
+    if(initialKey){const r=await rpc({cmd:'sources.cached',key:initialKey});if(!live)return;setProvider(r.item.provider);setSourceId(r.item.source_id);setSelected(r.item);}
+    else {const first=list.find(s=>s.provider==='github')||list[0];if(first){setProvider(first.provider);setSourceId(first.id)}}
+  }).catch(e=>{if(live)setError(String(e))});return()=>{live=false;generation.current++;detailGeneration.current++}},[initialKey]);
+  async function load(cursor='',append=false){
+    if(!sourceId)return;const serial=++generation.current;loading.current=true;setBusy(true);setError('');
+    try{const r=await rpc({cmd:'sources.items',source_id:sourceId,state,search,cursor,scopes,scope:['linear','jira'].includes(provider)?'':undefined});if(serial!==generation.current)return;setItems(old=>append?[...old,...r.items.filter((item:SourceItem)=>!old.some(previous=>previous.key===item.key))]:r.items);setNext(r.next);}
+    catch(e){if(serial===generation.current)setError(String(e))}finally{if(serial===generation.current){setBusy(false);loading.current=false}}
+  }
+  useEffect(()=>{setItems([]);setNext(null);if(sourceId)void load();return()=>{generation.current++;loading.current=false;setBusy(false)}},[sourceId,state,search,scopes.join('|')]);
+  useEffect(()=>{let live=true;setChoices([]);setScopes(source?.scope&&['linear','jira'].includes(source.provider)?[source.scope]:[]);if(source&&['linear','jira'].includes(source.provider))void rpc({cmd:'sources.scopes',source_id:source.id}).then(r=>{if(live)setChoices(r.choices)}).catch(e=>{if(live)setError(String(e))});return()=>{live=false}},[sourceId]);
+  function selectProvider(value:Provider){if(value===provider)return;setProvider(value);setSourceId(sources.find(s=>s.provider===value)?.id||'');setSelected(null);setItems([]);setError('');setQuery('');setSearch('');detailGeneration.current++;setDetailBusy(false);}
+  async function detail(item:SourceItem){setSelected(item);setStatus('');setDetailBusy(true);const serial=++detailGeneration.current;try{const r=await rpc({cmd:'sources.detail',source_id:item.source_id,key:item.key});if(serial===detailGeneration.current)setSelected(r.item)}catch(e){if(serial===detailGeneration.current)setError(String(e))}finally{if(serial===detailGeneration.current)setDetailBusy(false)}}
+  async function disconnect(){if(!source||!(await ask(`断开 ${source.name}？任务来源记录和已有工作区会保留。`)))return;try{await rpc({cmd:'sources.remove',source_id:source.id});const list=await refreshSources();setSourceId(list.find(s=>s.provider===provider)?.id||'');setSelected(null)}catch(e){setError(String(e))}}
+  function clearFilters(){setQuery('');setSearch('');setState('all');setScopes([])}
+  const filtered=!!search||state!=='all'||scopes.length>0;
+  const stateLabel=(item:SourceItem)=>!item.state||['open','opened','closed'].includes(item.state.toLowerCase())?(item.closed?'已完成':'未完成'):item.state;
+  return <section className="task-sources-page task-console" aria-label="任务">
+    <header className="source-page-heading"><div><h1>任务</h1><p>浏览来源任务，选择一项开始开发。</p></div><div className="source-heading-actions"><Button onClick={()=>setSettings('new')}><Link2 size={15}/>连接来源</Button><Button className="primary" disabled={!source} title={source?undefined:'连接来源后即可新建任务'} onClick={()=>setCreating(true)}><Plus size={15}/>新建任务</Button></div></header>
+    <div className="source-provider-tabs" role="tablist" aria-label="任务来源平台">{(Object.keys(providers) as Provider[]).map(p=><Button key={p} role="tab" aria-selected={provider===p} className={provider===p?'selected':''} onClick={()=>selectProvider(p)}>{providers[p]}{sources.some(s=>s.provider===p)&&<i aria-hidden="true" title="已有连接"/>}</Button>)}</div>
+    {error&&<div className="source-error" role="alert">{error}</div>}
+    {!source&&!selected?<div className="source-empty source-connect-empty"><span className="source-empty-icon"><Link2 size={25}/></span><h2>连接 {providers[provider]}，开始管理任务</h2><p>{['github','gitlab'].includes(provider)?'已有项目的仓库会自动出现，并使用 GitHub / GitLab CLI 的登录。也可连接其他仓库。':'先连接账号，浏览任务；开始开发时再选择本地项目。'}</p><div className="source-empty-actions"><Button className="primary" onClick={()=>setSettings('new')}>连接 {providers[provider]}</Button><Button onClick={()=>void refreshSources(true).then(list=>{const s=list.find(s=>s.provider===provider);if(s)setSourceId(s.id)}).catch(e=>setError(String(e)))}>重新识别项目仓库</Button></div></div>:<>
+      <div className="source-toolbar"><label>{provider==='linear'?'工作区':provider==='jira'?'站点':'仓库'}<select aria-label="任务来源连接" value={sourceId} onChange={e=>{setSourceId(e.target.value);setSelected(null);setScopes([]);detailGeneration.current++}}>{available.map(s=><option key={s.id} value={s.id}>{s.name}{s.scope?` · ${s.scope}`:''}</option>)}</select></label>
+      {choices.length>0&&<details className="source-scope-filter"><summary>{scopes.length?`已选 ${scopes.length} 个${provider==='linear'?'团队':'项目'}`:`所有${provider==='linear'?'团队':'项目'}`}</summary><div><Button onClick={()=>setScopes([])}>全部</Button>{choices.map(c=><label key={c.id}><input type="checkbox" checked={scopes.includes(c.id)} onChange={e=>{setScopes(old=>e.target.checked?[...old,c.id]:old.filter(id=>id!==c.id));setSelected(null)}}/>{c.name}</label>)}</div></details>}
+      <label>状态<select aria-label="任务状态" value={state} onChange={e=>setState(e.target.value)}><option value="open">未完成</option><option value="closed">已完成</option><option value="all">全部</option></select></label>
+      <form className="source-search" onSubmit={e=>{e.preventDefault();setSearch(query.trim())}}><Search size={15}/><Input aria-label="搜索来源任务" placeholder={provider==='linear'?'搜索任务标题':'搜索标题或内容'} value={query} onChange={e=>setQuery(e.target.value)}/><Button type="submit" disabled={busy}>搜索</Button></form>
+      <div className="source-toolbar-actions"><Button aria-label="刷新任务" title="刷新任务" disabled={busy||!source} onClick={()=>void load()}><RefreshCw size={15}/></Button><Button aria-label="连接设置" title="连接设置" disabled={!source} onClick={()=>source&&setSettings(source)}><Settings2 size={15}/></Button></div></div>
+      <div className="source-results-bar"><h2>任务列表 <span>{busy?'正在读取…':`已加载 ${items.length} 项`}</span></h2>{filtered&&<Button className="source-clear-filters" onClick={clearFilters}>清除筛选<X size={12}/></Button>}</div>
+      <div className={'source-content '+(selected?'has-detail ':'')+(selected||items.length?'has-pane':'empty-list')}>
+        <div className="source-list" aria-label="来源任务列表" aria-busy={busy}>
+          {items.length>0&&<div className="source-list-heading" aria-hidden="true"><span>任务</span><span>状态</span><span>最近更新</span></div>}
+          {items.map(item=><Button key={item.key} aria-pressed={selected?.key===item.key} className={'source-row '+(selected?.key===item.key?'selected':'')} onClick={()=>void detail(item)}><span className="source-row-text"><small className="source-row-id">{item.identifier}{links.some(l=>l.key===item.key)&&<FolderGit2 size={13} aria-label="已关联工作区"/>}</small><strong>{item.title}</strong><small className="source-row-meta">{[item.metadata?.assignees?.join("、"),item.metadata?.priority].filter(Boolean).join(" · ")}</small>{!!item.metadata?.labels?.length&&<small className="source-row-labels">{item.metadata.labels.slice(0,3).join(" · ")}{item.metadata.labels.length>3?` +${item.metadata.labels.length-3}`:""}</small>}</span><span className={'source-row-status '+(item.closed?'closed':'')}><i className={'source-state '+(item.closed?'closed':'')}/>{stateLabel(item)}</span><span className="source-row-date" title={item.updated_at}>{sourceDate(item.updated_at)||'暂无日期'}</span></Button>)}
+          {busy&&<div className="source-list-loading" role="status"><RefreshCw size={17}/><p>正在加载 {providers[provider]} 任务…</p></div>}{!busy&&!items.length&&<div className="source-empty"><span className="source-empty-icon">{error?<AlertCircle size={26}/>:search?<SearchX size={26}/>:<Inbox size={26}/>}</span><h2>{error?'任务暂时无法加载':search?'未找到匹配的任务':'当前条件下没有任务'}</h2><p>{error?'检查连接后重试，已有工作区与任务记录会保留。':search?'试试其他关键词，或清除筛选查看这个来源的任务。':'可以查看全部状态，或在当前来源创建一项新任务。'}</p><div className="source-empty-actions">{error?<Button className="primary" onClick={()=>void load()}>重新加载任务</Button>:<>{filtered&&<Button onClick={clearFilters}>{search?'查看来源全部任务':'查看全部任务'}</Button>}<Button className="primary" disabled={!source} onClick={()=>setCreating(true)}><Plus size={14}/>创建任务</Button></>}</div></div>}
+          {next&&<Button className="source-load-more" disabled={busy} onClick={()=>{if(!loading.current)void load(next,true)}}>加载更多</Button>}
+        </div>
+        {selected?<article className="source-detail"><div className="source-detail-top"><div className="source-detail-heading"><span>{providers[selected.provider]} · {selected.identifier}</span><Button onClick={()=>void openSourceUrl(selected.url).catch(e=>setError(String(e)))}><ExternalLink size={14}/>原任务</Button><Button aria-label="关闭任务详情" title="关闭任务详情" onClick={()=>{setSelected(null);detailGeneration.current++}}><X size={15}/></Button></div><h2>{selected.title}</h2><div className="source-detail-context"><span className={'source-row-status '+(selected.closed?'closed':'')}>{stateLabel(selected)}</span><p className="source-muted">{projects.find(p=>p.id===(linked?.project_id||selected.project_id))?.name||'开始开发时选择项目'}</p></div><div className="source-detail-actions"><Button className="primary" disabled={!projects.length} onClick={()=>linked?onOpen(linked.workspace_id):onStart(selected)}><FolderGit2 size={15}/>{linked?'打开开发工作区':'开始开发'}</Button><Button onClick={()=>void navigator.clipboard.writeText(taskPrompt(selected)).then(()=>setStatus('任务说明已复制')).catch(()=>setError('复制失败，请在原任务页面复制'))}><Copy size={14}/>复制任务说明</Button><span role="status">{status}</span></div></div><div className="source-detail-body">{detailBusy&&<p role="status" className="source-muted">正在更新详情…</p>}<section className="source-description-section" aria-label="任务描述"><h3>任务描述</h3><div className="source-description"><SourceTaskBody source={selected.description||'来源平台尚未填写任务描述。'}/></div></section><SourceTaskInfo item={selected}/><SourceTaskActivity key={selected.key} item={selected} onChanged={()=>{void detail(selected);void load()}}/></div></article>:items.length>0&&<aside className="source-detail-placeholder" aria-label="任务详情"><PanelRight size={25}/><h2>查看任务详情</h2><p>选择左侧任务，查看需求、讨论和关联的开发工作区。</p></aside>}
+      </div>
+    </>}
+    {settings&&<TaskSourceSettings key={settings==='new'?provider:settings.id} repositories={repositories} provider={provider} source={settings==='new'?undefined:settings} onClose={()=>setSettings(null)} onSaved={saved=>{void refreshSources();setSourceId(saved.id);setSelected(null);if(saved.id===sourceId)void load()}}/>}
+    {creating&&source&&<SourceTaskCreate source={{...source,scope:scopes.length===1?scopes[0]:source.scope}} onClose={()=>setCreating(false)} onCreated={item=>{setSelected(item);setItems(old=>[item,...old.filter(i=>i.key!==item.key)]);setState('open')}}/>}
+    {source&&<footer className="source-page-footer"><span title={source.scope||source.name}><i/>{source.scope||source.name}{source.auth_mode==='cli'?' · CLI 登录':''}</span><div>{provider==='github'&&<small>GitHub 最多显示前 1000 项</small>}<ActionMenu label="来源选项" icon={<MoreHorizontal size={16}/>}><Button onClick={disconnect}>断开来源</Button></ActionMenu></div></footer>}
+  </section>;
+}

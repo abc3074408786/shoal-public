@@ -1,0 +1,22 @@
+# Screen fixtures recorded from real agent CLIs. Each entry replays a raw
+# byte stream through the adapter classifier and asserts the verdict.
+# These are the moat: when an agent CLI ships a new screen, update or add a
+# fixture here — the nightly suite keeps velella honest against drift.
+fixtures:
+  - file: claude-trust-dialog.txt
+    adapter: claude-code
+    idle_secs: 10
+    expect: waiting_permission
+  - file: claude-main-prompt.txt
+    adapter: claude-code
+    idle_secs: 10
+    expect: waiting_input
+  - file: claude-working.txt
+    adapter: claude-code
+    idle_secs: 10
+    expect: none
+  - file: cmd-banner-dsr.txt
+    adapter: claude-code
+    idle_secs: 10
+    expect: none
+    contains_dsr: true

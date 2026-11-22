@@ -1,0 +1,4 @@
+.agent-logo{display:inline-flex;align-items:center;justify-content:center;flex:none;box-sizing:border-box;vertical-align:middle;font-style:normal;color:var(--foreground);pointer-events:none;}
+.agent-logo.is-mask{background:currentColor;mask-repeat:no-repeat;mask-position:center;mask-size:contain;}
+.agent-logo>img{display:block;inline-size:100%;block-size:100%;object-fit:contain;}
+.agent-settings-row.is-disabled>.agent-logo{opacity:.5;}

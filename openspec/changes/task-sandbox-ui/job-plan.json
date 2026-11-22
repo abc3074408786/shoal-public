@@ -1,0 +1,53 @@
+{
+  "admission": "inert",
+  "jobId": "product-design",
+  "kernel": [
+    "foundation",
+    "toolchain"
+  ],
+  "next": [
+    {
+      "action": "check",
+      "command": "foundation",
+      "required": true,
+      "role": "kernel"
+    },
+    {
+      "action": "resolve",
+      "command": "toolchain",
+      "required": true,
+      "role": "kernel"
+    },
+    {
+      "action": "route",
+      "command": "prism",
+      "required": true,
+      "role": "primary"
+    },
+    {
+      "action": "search",
+      "command": "design-system",
+      "required": false,
+      "role": "secondary"
+    }
+  ],
+  "planSha256": "967f8cf05fb688a1ca5cb80cc96e6c155915145486beb665ea757a3dbf5eabc6",
+  "primaryKnowledge": {
+    "action": "route",
+    "admission": "inert",
+    "command": "prism",
+    "id": "prism"
+  },
+  "query": "component-first: extend existing React task form with native versus isolated execution selector; reuse project UI",
+  "registrySha256": "9728e5cf6a74f78e7b89332295f205a5503e94633d24c62a32ed48698fe5349d",
+  "routeSha256": "9abfb207c6c441936aec9dd713cfa4c0c1fead1a2d4b1b96c0bb5431a0e6c48b",
+  "schema": "design-pipeline.job-plan.v1",
+  "secondaries": [
+    {
+      "action": "search",
+      "admission": "reference-only",
+      "command": "design-system",
+      "id": "astryx"
+    }
+  ]
+}

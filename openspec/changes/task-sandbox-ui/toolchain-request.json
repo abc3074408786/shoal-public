@@ -1,0 +1,15 @@
+{
+  "schema": "design-pipeline.toolchain-request.v1",
+  "framework": "react",
+  "brief": "Extend existing Velella task form; reuse project-owned native select and UI controls, CSS and no new dependencies.",
+  "existing": {
+    "styling": "none",
+    "uiLibrary": "none"
+  },
+  "requested": {
+    "styling": "none",
+    "uiLibrary": "none"
+  },
+  "jobPlanPath": "openspec/changes/task-sandbox-ui/job-plan.json",
+  "jobPlanSha256": "967f8cf05fb688a1ca5cb80cc96e6c155915145486beb665ea757a3dbf5eabc6"
+}

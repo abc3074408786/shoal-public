@@ -1,0 +1,1 @@
+Brand icons from Simple Icons v13, CC0-1.0: https://github.com/simple-icons/simple-icons/tree/v13.0.0 . Outlook is a locally drawn vector mark. Brand marks remain the property of their owners. Icons are served locally; page loads do not contact these services.

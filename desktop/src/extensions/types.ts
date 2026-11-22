@@ -1,0 +1,11 @@
+export type OntologyEntity={id:string;type:string;project:string;state:string;revision:number;fields:Record<string,string>;source:string;evidence:string};
+export type FieldDefinition={name:string;description:string;required:boolean;kind:{kind:'text'|'enum';values?:string[]}};
+export type EntityDefinition={name:string;name_cn:string;description:string;initial_state:string;states:string[];transitions:[string,string][];fields:FieldDefinition[]};
+export type OntologyDefinitions={entity_types:EntityDefinition[];roles:{id:string;name_cn:string}[];relations:{kind:string;name_cn:string;from_types:string[];to_types:string[]}[]};
+export type OntologyAction={kind:string;role:string;subject:string;subject_name:string;detail:string;missing?:unknown;subject_snapshot:{id:string;type:string;state:string;revision:number}};
+export type ExtensionInfo={id:string;name:string;version:string;description:string;installed?:boolean;enabled:boolean;dataDir:string;engine?:{version:string}};
+export type ExtensionRequest=<T=any>(operation:string,values?:Record<string,unknown>)=>Promise<T>;
+export type SemanticFact=OntologyEntity;
+export type SemanticRelation={id:string;kind:string;project:string;from:string;to:string};
+export type SemanticFinding={rule_id:string;severity:'error'|'warning';subject:SemanticFact|SemanticRelation;message:string;facts:SemanticFact[];relations:SemanticRelation[];missing:unknown;suggestion:string};
+export type SemanticReport={project:string;check_version:string;valid:boolean;summary:{errors:number;warnings:number};basis:'recorded_facts_only';rules:{id:string;title:string;statement:string}[];findings:SemanticFinding[];snapshot:{entities:{id:string;revision:number}[];relation_count:number}};

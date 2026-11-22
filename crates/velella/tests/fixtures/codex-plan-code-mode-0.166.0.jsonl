@@ -1,0 +1,7 @@
+{"type": "session_meta", "payload": {"id": "fixture-codex", "cwd": "C:/work/velella", "cli_version": "0.166.0"}}
+{"type": "response_item", "payload": {"type": "custom_tool_call", "name": "exec", "call_id": "fixture-call-1", "input": "await tools.update_plan({plan:[{step:\"Prepare fixture\",status:\"in_progress\"},{step:\"Check fixture\",status:\"pending\"}]});"}}
+{"type": "response_item", "payload": {"type": "custom_tool_call_output", "call_id": "fixture-call-1", "output": "Script completed\nWall time: 0.0 seconds\nOutput:\n"}}
+{"type": "response_item", "payload": {"type": "custom_tool_call", "name": "exec", "call_id": "fixture-call-2", "input": "await tools.update_plan({plan:[{step:\"Prepare fixture\",status:\"completed\"},{step:\"Check fixture\",status:\"in_progress\"}]});"}}
+{"type": "response_item", "payload": {"type": "custom_tool_call_output", "call_id": "fixture-call-2", "output": "Script completed\nWall time: 0.0 seconds\nOutput:\n"}}
+{"type": "response_item", "payload": {"type": "custom_tool_call", "name": "exec", "call_id": "fixture-call-3", "input": "await tools.update_plan({plan:[{step:\"Prepare fixture\",status:\"completed\"},{step:\"Check fixture\",status:\"completed\"}]});"}}
+{"type": "response_item", "payload": {"type": "custom_tool_call_output", "call_id": "fixture-call-3", "output": "Script completed\nWall time: 0.0 seconds\nOutput:\n"}}

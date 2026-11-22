@@ -1,0 +1,37 @@
+.cli-task-panel{flex:1;min-block-size:0;overflow:auto;overscroll-behavior:contain}
+.cli-monitor-tabs>[role=tab]{flex:1;min-inline-size:0;padding-inline:4px}
+.cli-task-monitor{min-inline-size:0;color:var(--foreground);font-size:12px}
+.cli-monitor-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 12px 8px}
+.cli-monitor-heading strong{font-size:12px;font-weight:600}
+.cli-monitor-heading>span,.cli-monitor-note{color:var(--muted-foreground);font-size:11px}
+.cli-monitor-note{padding:0 12px;line-height:1.7;overflow-wrap:anywhere}
+.cli-monitor-sessions{display:flex;flex-direction:column;padding:0 6px 10px}
+.cli-task-monitor .cli-monitor-session{display:flex;align-items:center;gap:8px;inline-size:100%;min-block-size:36px;padding:6px;text-align:start}
+.cli-monitor-session>svg{flex:none}
+.cli-monitor-session-name{flex:1;min-inline-size:0;overflow-wrap:anywhere}
+.cli-task-monitor .cli-monitor-session-name{white-space:normal}
+.cli-monitor-session small{flex:none;font-size:11px;color:var(--muted-foreground)}
+.cli-monitor-session small[data-waiting=true]{color:var(--amber)}
+.cli-monitor-session[aria-pressed=true]{background:var(--secondary)}
+.cli-monitor-session:active{background:var(--accent)}
+.cli-monitor-session:focus-visible,.cli-task-details>summary:focus-visible{outline:2px solid var(--ring);outline-offset:-2px}
+@media(hover:hover) and (pointer:fine){.cli-monitor-session:hover,.cli-task-details>summary:hover{background:var(--secondary)}}
+.cli-monitor-current{padding:10px 12px;border-block:1px solid var(--border)}
+.cli-monitor-current>div{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px}
+.cli-monitor-current strong{min-inline-size:0;overflow-wrap:anywhere;font-size:12px}
+.cli-monitor-current button{display:inline-flex;align-items:center;gap:5px;font-size:11px;min-block-size:30px}
+.cli-monitor-current p{margin-block:6px 0;color:var(--muted-foreground);line-height:1.7;overflow-wrap:anywhere}
+.cli-task-monitor .terminal-activity{max-block-size:none;border:0;background:transparent}
+.cli-task-monitor .terminal-activity>header{flex-wrap:wrap;padding:8px 12px;gap:6px}
+.cli-task-monitor .activity-current{flex-basis:100%;white-space:normal;overflow-wrap:anywhere}
+.cli-task-monitor .activity-list{max-block-size:clamp(200px,55vh,680px)}
+.cli-task-monitor .activity-item>summary{flex-wrap:wrap;gap:6px}
+.cli-task-monitor .activity-title{flex-basis:calc(100% - 30px)}
+.cli-task-monitor .activity-state{margin-inline-start:20px}
+.cli-task-monitor .activity-detail{padding-inline-start:0}
+.cli-task-details>summary{padding:12px;font-size:12px;cursor:pointer;border-block-start:1px solid var(--border)}
+.cli-task-details>summary:active{background:var(--accent)}
+.cli-monitor-activity>summary{padding:12px;font-size:11px;color:var(--muted-foreground);cursor:pointer;border-block-end:1px solid var(--border)}
+.cli-monitor-activity>summary:focus-visible{outline:2px solid var(--ring);outline-offset:-2px}
+.cli-monitor-activity>summary:active{background:var(--accent)}
+@media(hover:hover) and (pointer:fine){.cli-monitor-activity>summary:hover{background:var(--secondary)}}

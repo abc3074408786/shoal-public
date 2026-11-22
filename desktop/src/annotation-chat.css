@@ -1,0 +1,18 @@
+.agent-chat-output{display:flex;flex:1;min-block-size:100px;overflow:clip}
+.annotation-compose{flex:0 1 auto;max-block-size:55%;min-block-size:0;overflow:auto;scrollbar-gutter:stable}
+.annotation-cards{display:grid;gap:8px;list-style:none;padding:0;margin:8px 0;min-inline-size:0}
+.annotation-cards>li{display:grid;gap:6px;min-inline-size:0;padding:10px;border:1px solid var(--border);border-radius:var(--radius,5px);background:var(--background);font-size:12px}
+.annotation-card-heading,.annotation-compose-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.annotation-card-heading strong{margin-inline-end:auto}
+.annotation-card-heading .ui-button{font-size:11px;align-self:center}
+.annotation-cards :is(p,small){margin:0;overflow-wrap:anywhere;white-space:pre-wrap}
+.annotation-cards small,.annotation-patch,.annotation-compose-actions small{color:var(--muted-foreground)}
+.annotation-compose-actions small{flex:1 1 180px;font-size:11px}
+.annotation-compose textarea{min-block-size:60px;inline-size:100%;box-sizing:border-box;font:inherit;resize:vertical}
+.annotation-sent{font-size:12px;max-block-size:240px;overflow:auto}
+.annotation-sent summary{cursor:pointer;padding:4px}
+.annotation-sent article{border-block-end:1px solid var(--border);padding-block:8px}
+.annotation-sent article>p{white-space:pre-wrap}
+.annotation-cards .ui-button:active,.annotation-compose .ui-button:active{background:var(--accent)}
+.annotation-cards :is(button,textarea):focus-visible,.annotation-sent summary:focus-visible{outline:2px solid var(--ring);outline-offset:2px}
+@media (hover:hover) and (pointer:fine){.annotation-cards .ui-button:hover,.annotation-compose .ui-button:hover{background:var(--accent)}}

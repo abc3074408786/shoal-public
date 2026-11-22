@@ -1,0 +1,1170 @@
+Velella execution sandbox — runtime and task integration
+
+Status
+The Linux Restricted tool backend is connected to the original desktop Codex
+terminal and retains its native TUI/PTY. It is an opt-in experimental Git-worktree
+mode using Landlock/seccomp, separate from the namespace-based Isolated mode.
+The current implementation provides trusted system tools and recovery of the
+same model thread after a confirmed normal stop. See "Current native terminal:
+tools and same-thread recovery" at the end for the current scope and evidence.
+The earlier chat-panel, startup-only and no-recovery sections below are historical
+stages; the separate Restricted chat-panel adapter still has no recovery support.
+
+The shared PTY execution entry point accepts an explicit sandbox policy. Old
+requests/descriptors default to native and keep their original behavior. The Linux
+backend uses /usr/bin/bwrap. Windows and macOS isolated backends are unimplemented
+and reject isolated requests. This is not a container/VM implementation.
+
+Entrypoints
+  velella session sandbox-capabilities
+  velella-runtime sandbox-capabilities
+Both commands probe locally without needing a daemon. Existing daemon protocols
+also accept {"cmd":"sandbox.capabilities"}.
+
+With a running CLI daemon, opt into isolation for a new session:
+  velella session spawn --cwd /absolute/canonical/task-directory \
+    --sandbox-policy examples/sandbox-isolated.json -- /bin/sh
+The daemon's session.spawn JSON accepts the same object in its "sandbox" field.
+Native policy is {"mode":"native"}. Isolated policy is:
+  {"mode":"isolated","read_only":[],"writable":[],"network":"denied"}
+Unknown fields, modes and network modes are rejected. Additional mount paths must
+be absolute, canonical, existing directories; overlaps and reserved paths fail.
+The cwd itself is writable and must not be repeated in writable/read_only.
+
+Isolation contract
+The host root and HOME are not mounted. System executable/library directories and
+selected loader/TLS files are read-only. The working directory and explicitly
+listed writable directories are writable. /tmp is private and ephemeral. HOME is
+ephemeral unless a dedicated home directory is explicitly configured; task HOME
+is managed and persistent across setup, agent, verification, shells and recovery. Host environment variables are cleared.
+Only explicit request env plus safe PATH/terminal defaults enter the sandbox;
+HOME and TMPDIR cannot be overridden. User/IPC/PID/UTS namespaces are isolated,
+capabilities dropped, and a new terminal session prevents controlling-terminal
+injection. Bubblewrap manages child reaping and die-with-parent cleanup.
+
+network=denied creates a private network namespace. network=host explicitly gives
+full host networking, including localhost and the local network; it is NOT a domain
+allowlist. Filesystem access and network policy are separate controls.
+
+Capability detection executes the actual namespace/mount setup with /bin/true,
+not just a binary/version check, with a three-second timeout. An installed bwrap
+can still be unusable under host/container security policy. Isolated execution
+fails closed, including when mounts fail after the probe. It never retries the
+requested command natively. No host security setting is changed by the probe.
+
+Task execution
+Desktop task definitions accept policy.execution with the same schema. See
+examples/task-isolated.yaml. Creation and preparation probe the backend and reject
+unavailable isolation before creating a worktree or running setup. All task phases
+use the same policy, including retries, verification and the task's manual shell.
+Policy survives task YAML export and persisted task JSON. Legacy definitions stay
+native. Direct-folder tasks are not supported in isolated mode. The older CLI task
+runner explicitly rejects isolated tasks; use the desktop runtime task executor.
+
+Task HOME is created under <data-dir>/sandbox-tasks/<task-id>/home, mounted at
+/home/velella. Omit execution.home for tasks. No existing host account/config/keyring
+is imported. Sign in through the task terminal if needed. Tools installed outside
+the standard system directories require explicit canonical read_only installation
+directories, including their interpreter/runtime dependencies. Agent executable
+resolution fails explicitly when its installation is not visible to the sandbox.
+Read-only Git common metadata is mounted automatically for status/diff; commits
+and index writes remain unavailable. GIT_OPTIONAL_LOCKS=0 avoids optional writes.
+
+Agent sessions receive a dedicated read-only support directory containing settings
+and an event-only Unix socket. A task-scoped copy of the runtime implements the
+hook client. That socket accepts only known hook events and bounded metadata;
+terminal input, kill, resize, permission changes and arbitrary RPC are rejected.
+Setup/check/shell sessions get no hook socket. The full host control socket and
+runtime data root are never mounted automatically; explicit task mounts exposing
+the runtime data root are rejected. Hook events remain agent-reported telemetry,
+not proof of correctness: configured verification commands still determine checks.
+
+Browser/MCP injection is disabled for isolated tasks pending a scoped browser
+broker. Native chat still rejects isolated descriptors. Existing Codex/Claude
+native permission flags remain in place inside the outer sandbox. Credentials and
+session data in task HOME persist for recovery; automatic cleanup is not yet
+implemented. The desktop new-task dialog offers execution mode, network access
+and optional read-only/writable directories. Capability checks disable unavailable
+isolation; a failed recheck never changes an isolated selection to native. Task
+details show the saved execution scope. YAML and task.create remain supported.
+
+Scope and outstanding work
+Windows/macOS backends, scoped browser brokering, and real authenticated Agent
+end-to-end validation remain outstanding. Kernel isolation acceptance passed on
+a GitHub-hosted Ubuntu 22.04 runner on 2026-10-20 (details below). A successful descriptor/bridge test is
+not a claim that a real Agent completed a task inside the kernel sandbox.
+
+Policies and mount roots are trusted host inputs. Mounting sensitive directories,
+Unix sockets or runtime state can grant host capabilities. Use dedicated task
+directories, not the user's home, application runtime directories or Docker socket
+locations. This first backend has no syscall filter, CPU/memory/disk quotas,
+credential broker, network proxy or VM boundary. It is not yet approved for
+hostile multi-tenant workloads. Explicit env values are launch metadata; do not
+use them as a secret store. Host-mounted data remains accessible to the host.
+
+Validation
+  cargo check -p velella --all-targets
+  cargo test -p velella --lib sandbox:: -- --nocapture
+  cargo test -p velella --lib sessions::
+  cargo test -p velella --lib task_sandbox::
+  cargo test -p velella --lib host::tests::sandbox
+  cargo test -p velella-core
+For a Linux CI machine where isolation MUST work, set VELELLA_REQUIRE_SANDBOX=1
+when running sandbox tests. Otherwise the conditional live test validates refusal
+when the host blocks namespaces; that outcome is not evidence of confinement.
+On the development host on 2026-10-20, bwrap could not mount /proc (Operation not
+permitted). Native compatibility and fail-closed behavior are testable here;
+successful kernel isolation still requires a permitted Linux host. No Windows or
+macOS runtime validation has been performed.
+
+Strict acceptance runner
+  python3 scripts/verify-sandbox.py
+Writes logs and result.json to artifacts/sandbox-acceptance (or --output). Exit 0
+means the kernel, task-policy and hook-bridge checks passed. Exit 2 means the host
+cannot support the required sandbox; exit 1 means a build/probe/test failed. The
+script does not change host security settings or start an authenticated Agent.
+It also runs a deterministic test Agent through the real runtime: Git worktree
+preparation, setup, PTY launch, event-only hooks, verification, review and resume.
+This is explicitly distinct from a real Claude/Codex model completing a task.
+The test is ignored in ordinary unit runs because it requires a built runtime and
+working namespaces. To invoke it directly on a prepared Linux host:
+  cargo build -p velella --bin velella-runtime
+  VELELLA_REQUIRE_SANDBOX=1 VELELLA_TEST_RUNTIME="$PWD/target/debug/velella-runtime" \
+    cargo test -p velella --lib live_task_pipeline_with_fixture_agent -- --ignored --nocapture
+The receipt includes a fixed allowlist of host diagnostics: kernel version,
+namespace limits, AppArmor userns restriction/profile, and required executable
+availability. These values are evidence, not proof of which security rule denied
+the mount. No environment variables or credentials are collected. Cargo metadata
+locates the runtime binary even when a custom target directory is configured.
+Test the runner's pass/fail/blocked/timeout handling without launching a sandbox:
+  python3 scripts/test-verify-sandbox.py
+The manual sandbox-acceptance GitHub workflow requires a prepared self-hosted
+Linux runner labelled velella-sandbox with Rust, system build dependencies,
+/usr/bin/bwrap and /usr/bin/python3. It uploads the receipt even on failure.
+
+Desktop validation
+  npm --prefix desktop test
+  npm --prefix desktop run build
+The development-only tests/sandbox-ui.html fixture can be opened through Vite.
+Its scenario query accepts ready, unavailable, windows, error, flaky, loading and
+direct. It mocks runtime RPC, records task.create in the page, and starts no task.
+It is not a substitute for testing the installed desktop against a real runtime.
+
+Hosted kernel acceptance — 2026-10-20
+Passed: https://github.com/abc3074408786/shoal/actions/runs/39371410672
+Commit: 1e29a4fa6d0f9fcd46b6dae0eb529241824db51b
+Test branch: codex/sandbox-kernel-probe-20261020 (main unchanged).
+A minimal standalone crate compiled exact copies of sandbox.rs and core
+execution.rs; SHA-256 hashes matched the workspace at that run. All six tests passed
+with VELELLA_REQUIRE_SANDBOX=1. The live test exercised read-only denial, hidden
+host files and symlink targets, writable task/cache directories, distinct PID
+namespace, denied localhost networking, explicit host networking, persistent
+HOME and ephemeral /tmp. No host security restrictions were disabled.
+This proves those kernel primitives on that runner, not authenticated Agent or
+full desktop task integration. The current development host remains blocked.
+Local PTY integration also verified refusal leaves no command side effects and
+no registered session when the backend is unavailable.
+Evidence downloaded to artifacts/sandbox-hosted-kernel/ (ignored by Git).
+
+Hosted task execution acceptance — 2026-10-20
+Passed: https://github.com/abc3074408786/shoal/actions/runs/39372050379
+Commit: 8664a5d49bbc40de35d68585b077b8d283262dbf
+The Rust runtime snapshot was built on Ubuntu 22.04; all 53 copied source
+and manifest SHA-256 hashes were verified against the local workspace at that run.
+Ten sandbox/policy tests passed, then the explicitly invoked live task pipeline
+test passed (1.91 seconds). It exercised real worktree creation, setup, PTY Agent
+launch, staged hook helper and event-only IPC, verification commands, transition
+to verified review, process stop, task JSON reload and native-session resume with
+persistent HOME and human control restored. The test Agent was a deterministic
+Python fixture, not Claude/Codex and not an authenticated language model. Task
+creation through desktop RPC, full daemon restart and UI were not covered by this
+particular test. No account credentials were uploaded and main was unchanged.
+Evidence: artifacts/sandbox-hosted-pipeline/.
+
+Local real-model task acceptance — 2026-10-20
+A private temporary daemon/project exercised project.add and task.create RPC,
+worktree creation, actual logged-in Codex (gpt-6-astra), real hook events,
+verification command execution and verified review state. Codex fixed clamp.py;
+the runtime's six tests and an independent rerun passed. Only clamp.py changed;
+tests and the original checkout remained unchanged. First-use repository trust
+required an explicit terminal confirmation; automatic control was then restored.
+The test task and its private daemon were stopped after capturing the result.
+This used native execution with Codex workspace-write, not Velella bubblewrap.
+It does not combine real-model and custom-sandbox acceptance in a single run.
+Receipt: artifacts/local-runtime-model/result.json.
+
+Prepared real-model + custom-sandbox acceptance (not executed)
+User chose preparation only; no remote login or model call has been started for
+this combined test. scripts/verify-real-sandbox-agent.py requires the explicit
+--allow-device-login flag. It first requires working kernel isolation, then starts
+a private runtime and an isolated task with explicit host networking. Project
+setup runs Codex device login inside the task's dedicated HOME; no existing host
+auth cache is copied. The actual Agent then fixes a small test fixture, emits
+hooks, and must reach verified review with unchanged tests and an unchanged
+original checkout. The Agent is stopped and the fixed fixture inventory is
+checked before task.verify reruns the trusted tests inside the same isolation.
+The host does not execute candidate Python or run Git in the candidate worktree.
+Only challenge.json and result.json may be uploaded; login caches and transcripts
+are excluded. The temporary task, private daemon and HOME are cleaned afterward.
+
+.github/workflows/sandbox-real-agent.yml is prepared locally with workflow_dispatch
+and an explicit allow_device_login boolean (default false). Pushes do not trigger
+login. It has not been installed as an active remote workflow or started. A copy
+under the temporary branch's .ci/full-runtime/ is source input for unit tests only;
+GitHub does not load that nested file as a workflow. It expects runtime sources
+and script at repository root. Once login is authorized, the workflow installs
+the pinned CLI and publishes a short-lived
+device challenge for the user to complete. This requires device-code login to be
+enabled for the account/workspace. No pass is claimed until the actual run ends.
+Preparation checks: challenge parsing tests, Python compilation, workflow YAML,
+shell blocks, embedded Python, and missing-authorization refusal all passed.
+The preparation-only follow-up added protocol simulations (no subprocess/model
+login) for malformed capabilities, unavailable isolation, native fallback,
+modified tests, unverified tasks, absent hooks, cancellation failures, HOME
+cleanup failures and stale evidence. Ten real-agent harness tests and five
+kernel-runner receipt tests passed at that stage. Reports/challenges are written atomically;
+an output directory containing old evidence is rejected. A passing task cannot
+produce a successful receipt if cleanup could not be confirmed.
+The subsequent harness review expanded coverage to 17 passing tests, including
+manual login authorization, extra/modified files, symbolic/hard links, stopping
+before re-verification, and failed re-verification. Its fixed verification command
+uses /usr/bin/python3 -I and an embedded trusted test suite. Only handwritten
+correct/incorrect fixtures were executed locally to validate that command; no
+model output or login was used. Workflow YAML, shell and embedded Python checks
+also passed. These preparation checks do not establish real-model acceptance.
+
+No-login RPC fixture mode
+  python3 scripts/verify-real-sandbox-agent.py --runtime target/debug/velella-runtime \
+    --output artifacts/sandbox-rpc-fixture --fixture-agent --timeout 90
+This uses the same acceptance loop with a fixed Python protocol fixture, a private
+copy of the actual runtime and denied networking. No Codex installation or login is
+used. Setup writes only a task HOME marker; the fixture changes clamp.py and emits
+real runtime hook events through the isolated socket. The script must reach review,
+cancel the Agent, inspect the fixed files, call task.verify, reach verified review
+again, stop the task/daemon and remove the owned test directory. Its receipt says
+agent_kind=fixture and never counts as real-model acceptance. --fixture-agent and
+--allow-device-login are mutually exclusive. The separate sandbox-protocol workflow
+can run this no-login test manually.
+Twenty harness tests pass, including a candidate that tries SystemExit(0) before
+running the test suite. Verification now explicitly requires six completed tests
+and a successful result. This is functional acceptance, not a claim that arbitrary
+hostile Python cannot spoof an in-process test runner.
+Local fixture execution remains blocked by /proc mounting; it exits 2 before
+starting a daemon or Agent. Receipt: artifacts/sandbox-rpc-fixture-local/result.json.
+
+Hosted actual CLI startup without login — 2026-10-20
+Passed: https://github.com/abc3074408786/shoal/actions/runs/39406355190
+Commit: a719f3fb643a2c1be8338e4870ff31ff6a8ec6e0
+Installed the real pinned Codex CLI 0.153.4 on the temporary Ubuntu 22.04 runner.
+Within the actual Velella isolated launcher, with network denied and a dedicated
+HOME, --version and exec --help succeeded; login status correctly reported not
+logged in. Synthetic launcher credential environment was not inherited, and no
+auth.json was created. Source hashes match this workspace. No device login,
+model request or host account copy occurred. This resolves CLI startup/library
+compatibility only; authenticated model execution remains unverified.
+Evidence: artifacts/sandbox-real-cli-startup/.
+
+Hosted no-login RPC acceptance — 2026-10-20
+Passed: https://github.com/abc3074408786/shoal/actions/runs/39412000066
+Commit: b6c0bdd26aff7606391812f7fada17ef699c439c
+The Ubuntu 22.04 job passed in 40 seconds. All 57 source/test file hashes match
+the local checkout. Twenty harness tests passed, then the built runtime and
+fixed Codex-protocol fixture exercised project.add/task.create, isolated setup,
+PTY launch, real hook helper/events, six fixed functional checks, verified review,
+task.cancel, isolated task.verify and a second verified review. Only clamp.py
+changed; fixed tests and the original checkout remained intact. The receipt
+confirms hooks_ready=true, turns=1, denied networking, task_stopped=true and
+temporary_home_removed=true. No account credentials, login or model were used.
+This closes the actual daemon RPC stop/re-verification gap; it is still fixture
+acceptance and does not establish authenticated model execution in isolation.
+Evidence: artifacts/sandbox-rpc-fixture-hosted/verified-result.json and the
+downloaded runtime receipt under that directory.
+
+Local Landlock filesystem prototype — 2026-10-20
+The current development host supports Landlock ABI 4. A standalone prototype in
+scripts/landlock-probe.c enforces ABI 3 file-content access rules without creating
+namespaces or mounting /proc. It requires ABI >= 3 (including TRUNCATE), enables
+no_new_privs, closes inherited descriptors >= 3, clears the execution environment
+and then execs the fixed test process. Setup failure never executes the command.
+No host policy, account credentials, model or installed application is changed.
+
+Run on Linux with a C compiler, Landlock headers and Python 3:
+  python3 scripts/verify-landlock.py --output artifacts/landlock-local-new
+The output directory must be new or empty. The runner builds the helper in a
+temporary directory, tests only synthetic files and removes its temporary tree.
+scripts/fixtures/landlock-checks.py performs the actual file operations.
+
+The initial local run passed 19 restricted-process cases, plus compilation and
+two independent host checks. Coverage includes work directory CRUD, read-only
+reads, denial of writes/deletion/truncate and O_RDONLY|O_TRUNC, hidden-content
+reads/writes/listing, symlink escape, creation of hard links or renames from the
+outside fixture into the work directory, child/grandchild inheritance, closed
+inherited file descriptors and a cleared environment. The host independently
+confirmed unchanged outside/read-only contents and links, and successful writes
+by the two descendant generations. Six separate malformed-policy checks also
+refused execution without creating their marker files.
+Initial evidence: artifacts/landlock-local/result.json.
+Invalid-policy evidence: artifacts/landlock-launcher-refusal/result.json.
+Final evidence: artifacts/landlock-local-final/result.json. All 22 top-level
+checks passed on this host with ABI 4; named child/grandchild evidence is nested
+in the receipt. All three source hashes were independently matched afterward.
+Temporary files were removed. Separate harness checks confirmed rejection of
+old evidence without modification and termination of the fixed parent/child
+process group on timeout. The final runner fixes stdin to /dev/null and records
+blocked status on non-Linux platforms.
+
+This is a file-content permissions prototype, not a replacement for the existing
+isolated task policy. It has no network, PID namespace or general IPC isolation,
+and no production task/PTY integration. ABI 4 does not cover file metadata changes
+such as chmod, or signal/UNIX-socket isolation. Previously existing hard links,
+hostile changes to policy directories and caller-provided standard descriptors
+require additional production design. No complete security boundary or real-model
+task acceptance is claimed from these checks. The existing Bubblewrap policy is
+unchanged and does not silently fall back to this prototype.
+Reference: https://docs.kernel.org/userspace-api/landlock.html
+
+Experimental local restricted task backend — 2026-10-20
+The filesystem prototype above is historical. A separate runtime execution
+mode now connects Landlock and seccomp to the task runtime:
+  {"mode":"restricted","network":"denied","read_only":[],"writable":[]}
+See examples/sandbox-restricted.json. The task runtime supplies a private HOME.
+Native remains the default. Restricted is distinct from the Bubblewrap isolated
+mode, never an automatic fallback when Bubblewrap fails. Unsupported platforms,
+missing kernel support and invalid policies refuse execution.
+
+On this development machine, actual runtime capability probes report Bubblewrap
+unavailable (/proc mounting denied), but restricted available. The latter probe
+runs in a fresh process, installs both policies, checks allowed runtime reads and
+denied outside reads/INET/INET6/external UNIX sockets, and requires an exact receipt.
+The parent daemon is never restricted by the capability check.
+
+Restricted uses Landlock ABI >= 3, no_new_privs, dropped capabilities, a clean
+environment and task-owned HOME/.tmp. Only approved directories, system runtime
+files and specific devices are accessible. The launcher closes inherited FDs >= 3
+and rejects sockets, regular files and directories as standard descriptors.
+Seccomp denies network and external UNIX sockets, io_uring, process-control alternatives,
+namespace operations and metadata mutation. Architecture/x32 checks and argument
+checks for clone, ioctl and fcntl prevent the tested alternate paths.
+Anonymous AF_UNIX/SOCK_STREAM and SOCK_SEQPACKET socket pairs with protocol 0
+are permitted for communication within the task. STREAM supports the real Codex
+CLI's signal handling; SEQPACKET supports anonymous packet IPC. Only CLOEXEC and
+NONBLOCK flags are accepted. Other pair domains/types/protocols/flags and
+connect/bind/listen/accept/sendmsg/recvmsg remain denied.
+
+Setup, Agent, verification and task shell all preserve the selected policy.
+The event-only hook transport uses a separate writable inbox, since a UNIX socket
+would violate the network policy. The host pins the directory FD before launch,
+accepts bounded regular single-link files, filters the event schema, and sends
+atomic acknowledgements in order. Agent-accessible helpers/settings are read-only;
+the daemon control endpoint, user login files and unrelated runtime state are
+outside the permitted directories.
+
+This mode is experimental, Linux-only and offline. There is no PID/mount namespace,
+metadata hiding, resource quota, credential broker or model network transport.
+Even writable directories cannot use chmod/chown/utime/xattr updates, so some
+installers and developer tools will fail. Existing hard links inside permitted
+directories and hostile host-side replacement of policy directories are outside
+the demonstrated guarantee; only grant directories appropriate for the task.
+The UI explicitly explains these limits and cannot select host networking for
+Restricted. No authenticated model test is implied by fixed-fixture acceptance.
+
+Reproduce the actual launcher checks with:
+  python3 scripts/verify-restricted.py --runtime target/debug/velella-runtime \
+    --output artifacts/restricted-kernel-new
+Reproduce the real daemon/task protocol with:
+  python3 scripts/verify-real-sandbox-agent.py --runtime target/debug/velella-runtime \
+    --output artifacts/restricted-rpc-new --fixture-agent --execution restricted --timeout 90
+Both commands require new/empty evidence directories, use only owned synthetic
+fixtures, record source/runtime hashes, and clean up their temporary files.
+Restricted acceptance rejects --allow-device-login.
+
+The initial local launcher run passed 41 checks, including file contents and
+metadata, IPv4/IPv6 TCP/UDP, UNIX/socketpair, session/group escape, fcntl signal
+ownership, inherited descriptors, clean environment and child/grandchild
+inheritance. Host checks independently confirmed unchanged outside files.
+Evidence: artifacts/restricted-kernel-local-initial/result.json.
+The initial real RPC run passed setup, PTY Agent execution, real hook helpers,
+six functional checks, verified review, cancellation and independent task.verify
+after the Agent stopped. Only clamp.py changed; the original checkout and fixed
+tests remained intact. The private daemon and temporary HOME were cleaned up.
+Evidence: artifacts/restricted-rpc-local-initial/result.json.
+These runs used a fixed Codex-protocol fixture, no model or login.
+
+Frontend verification: 82 tests and the production build passed. A real App with
+mock RPC responses was exercised for restricted-only availability, capability
+recheck failure, and an older backend without restricted capability. Selection,
+offline policy submission and disabled submission after failure behaved correctly.
+This UI check did not start a real task.
+
+Lifecycle handling uses a private PTY process group. Restricted descendants cannot
+call setsid/setpgid; cancellation kills the whole group. Normal leader exit also
+terminates remaining descendants. waitid(WNOWAIT) retains the leader PID until
+group cleanup finishes, preventing later cancellation from targeting a reused PID.
+Real host/PTY tests cover cancellation and natural exit with children/grandchildren
+that ignore SIGHUP. Abrupt loss of the host process is not covered by this cleanup
+guarantee; this backend does not have a cgroup or independent lifecycle guardian.
+
+Actual local Codex startup exposed an additional compatibility issue: refusing all
+socketpair calls caused Codex 0.153.4 to panic during Tokio signal initialization,
+even for --version. The first failure evidence is retained at
+artifacts/restricted-cli-local/result.json. The anonymous stream-pair exception
+above addresses that internal communication requirement without permitting
+external network or UNIX socket connections.
+
+Final local v2 acceptance (anonymous stream-pair compatibility included)
+- artifacts/restricted-kernel-v2/result.json: all 50 checks passed. Includes
+  internal pair read/write with supported flags, rejection of other pair
+  domains/types/protocols/flags, and connect/bind/listen/accept/sendmsg/recvmsg
+  denial on those pairs. Six unsafe stdin/stdout/stderr cases refuse before exec.
+  Non-leader children test setsid/setpgid, avoiding a natural-EPERM false positive.
+- artifacts/restricted-rpc-v2/result.json: real daemon/task setup, fixed Agent,
+  real file hooks, six functional checks, cancellation and task.verify passed.
+  hooks_ready=true, turns=1, only clamp.py changed, task stopped and HOME removed.
+  This receipt records 56 source hashes and the actual runtime hash.
+- artifacts/restricted-lifecycle-v2/result.json: real host/PTY cancellation and
+  normal exit both terminated HUP-ignoring children/grandchildren and exited the
+  host. Source/runtime hashes are recorded. Reproduce with:
+    python3 scripts/test-restricted-lifecycle.py --runtime target/debug/velella-runtime \
+      --output artifacts/restricted-lifecycle-new
+- artifacts/restricted-cli-local-final/result.json: the installed actual Codex
+  native binary returned codex-cli 0.153.4 for --version, printed exec --help,
+  and reported Not logged in for login status (expected exit 1). Only the exact
+  installed binary directory was additionally read-only; HOME/work were private.
+  No auth.json was created and temporary files were removed. PATH alias creation
+  still warns EPERM; this startup check does not establish full CLI tool execution.
+
+All four final receipts used runtime SHA256
+edca7d35881fb641c419c0ed1a65f4338ea42f6947f1427364bbe0df9f91a377.
+Source and runtime hashes were matched after testing. No account login, model
+request, host security change or installed-app replacement occurred.
+Additional validation: 105 library tests (5 environment-specific tests ignored),
+22 core tests, 22 real-agent harness tests and 5 existing sandbox harness tests
+passed. The final socket-pair revision separately passed all 4 backend tests.
+Both CLI/runtime binaries and the frontend production build succeeded.
+
+Authenticated real-model acceptance remains open. This backend currently denies
+external networking; enabling an actual model workflow needs an explicitly
+designed model network/credential path as well as a real task acceptance run.
+Windows/macOS backends remain unimplemented and are not inferred from Linux tests.
+
+Codex controller/executor separation investigation — 2026-10-20
+The installed actual Codex 0.153.4 supports an experimental environments.toml
+stdio transport. An isolated controller HOME can select a named environment
+with include_local=false. Asking for environment "local" then returns the
+specific unknown-environment error. This transport keeps model HTTP on the
+controller side; the execution service needs only inherited protocol pipes.
+These are installed-version observations, not a stable public API promise.
+
+The actual bundled exec-server starts inside Restricted and successfully
+initializes, reports ready and handles confined file read/write requests:
+  artifacts/restricted-exec-server-probe/final/result.json
+  artifacts/restricted-exec-server-tools-probe/process/result.json
+It cannot run its process/start implementation under the current policy.
+Tracing identified an anonymous SEQPACKET pair, then recvfrom, setsid and
+setpgid. The latter operations remain denied: allowing a command to leave
+its owned process group would invalidate the current cancellation guarantee.
+The actual controller-to-model-fixture-to-native-executor failure is retained:
+  artifacts/codex-restricted-environment-v1/result.json
+  artifacts/codex-restricted-native-v3/result.json
+The second run was intentionally interrupted after 15 seconds to capture its
+protocol; all owned processes/temporary directories were cleaned up.
+
+The narrowly scoped anonymous SEQPACKET compatibility change is independently
+covered by the v3 capability probe, four backend unit tests and 51 real kernel
+checks, all passing:
+  artifacts/restricted-seqpacket-final/result.json
+Runtime SHA256:
+  439be32c51f07c123ced68ce5f689ee6e7f50ca405d03f2b14e7d824b496e71c
+Source trace and remaining native-executor failure:
+  artifacts/restricted-exec-server-tools-probe/seqpacket/result.json
+No network endpoint, recvfrom/sendmsg/recvmsg, setsid or setpgid exception was
+added. Anonymous IPC compatibility does not imply native tool compatibility.
+
+The intended integration uses a trusted controller-side protocol adapter that
+launches each command and filesystem operation through restricted-exec. The
+adapter owns process groups outside the filter; each actual task operation runs
+inside the existing kernel restrictions. This is separate from embedding the
+native exec-server inside one sandbox, which is the failed experiment above.
+
+The app-server client RPC layer must retain its explicit method allowlist:
+app-server fs/readFile/fs/writeFile and process/spawn refer to host operations;
+they are different from the selected environment's exec-server protocol.
+include_local=false is not an access-control policy for arbitrary app-server
+client RPCs. Plugins, MCP, browser/computer tools and other host-side extensions
+also need separate review before enabling them in a restricted product mode.
+
+First working offline Codex/tool separation prototype (Python helper baseline)
+scripts/fixtures/restricted-exec-server.py now implements the required stdio
+protocol subset as a trusted test adapter. Fixed configuration selects the
+actual runtime, work, private home and read-only roots. The runtime executable
+and adapter/configuration must stay outside task-writable trees.
+
+At this baseline, process requests enter restricted-exec with the fixed work root. A
+confined helper validates/chdirs to a requested work subdirectory and execs
+the command using only the environment already cleaned by the runtime.
+Filesystem requests likewise run in a confined helper. Model-supplied paths,
+environment variables and sandbox parameters cannot replace the fixed policy.
+Unsupported RPCs, PTYs and managed network/sandbox variants fail explicitly.
+Each operation has an owned group; WNOWAIT holds its leader until cleanup.
+Protocol output is bounded and nonblocking so a stalled reader cannot prevent
+process cleanup. Signal handlers request shutdown instead of interrupting
+process ownership transfer halfway through construction.
+
+Final evidence, all with the v3 runtime hash above:
+- artifacts/codex-restricted-adapter-v3/result.json: 25 acceptance assertions
+  passed using the installed actual Codex 0.153.4 controller and a fixed local
+  Responses server. The first turn executed two real tools, returned their
+  actual outputs and completed. Six kernel-boundary checks passed: cwd,
+  removal of synthetic host environment, outside read/write denial, read-only
+  write denial and network denial. A second command ran from a subdirectory
+  and created HUP-ignoring children/grandchildren.
+- Disconnecting the adapter terminated all three fixture processes. Codex still
+  requested model output afterwards, so the test explicitly issued another
+  fixed tool call. Its executor connection error was returned to the model;
+  neither a work marker nor a host marker was created. No command silently
+  fell back to host execution in this tested path.
+- Only exec_command, write_stdin and request_user_input were advertised under
+  the test configuration. Orchestrator skills were explicitly disabled as
+  well as optional host extensions. skip_host_skill_discovery alone is not a
+  general skill disable switch.
+- artifacts/restricted-exec-server-direct-final/result.json: 10 direct protocol
+  checks passed, covering confined filesystem access including a 1 MiB file,
+  missing-file errors, rejected unsupported/escalated requests and writable
+  runtime configuration, subdirectory/env handling, normal-exit descendant
+  cleanup, repeated cancellation, EOF and SIGTERM with stdout backpressure.
+- scripts/test-codex-responses-fixture.py: 23 local HTTP fixture tests passed,
+  including multiple turns and refusing missing/mismatched tool outputs.
+
+Both final integration receipts match adapter SHA256:
+  a8027b69e9aab3aa37781712fce0f59a8cdec038f958f921b26ba207c7314f79
+They confirm unchanged source/runtime hashes and cleanup of owned processes
+and temporary directories. Earlier failed/partial runs remain separate.
+
+Reproduce without logging in:
+  python3 scripts/test-codex-responses-fixture.py
+  python3 scripts/test-restricted-exec-server.py \
+    --runtime target/debug/velella-runtime --output artifacts/adapter-direct-new
+  python3 scripts/verify-codex-restricted-environment.py \
+    --runtime target/debug/velella-runtime \
+    --codex /absolute/path/to/the/native/codex \
+    --output artifacts/adapter-codex-new
+Use the actual native Codex binary, not a Node/shell launcher. Evidence output
+directories must be new or empty. --executor-kind native preserves the failed
+native-exec-server experiment; adapter is the successful default.
+
+This is a Linux test prototype, not a desktop product integration. It has
+bounded process/output/file sizes and implements only a protocol subset.
+Requests and file content in its debug traces are synthetic; this harness is
+not an authentication or production logging solution. A forced SIGKILL/crash
+of the trusted adapter can still prevent descendant cleanup; there is no
+cgroup or independent guardian.
+
+No real model was called, no login was initiated and no host authentication
+file was loaded by the configured controller. Credential separation here is
+evidenced by a fresh HOME/CODEX_HOME, file-only credential stores and a clean
+environment, not a syscall audit of every possible host read. Real model and
+account reuse, desktop lifecycle integration, and Windows/macOS enforcement
+remain separate unfinished acceptance work.
+
+Local execution overhead benchmark — 2026-10-20 (before native helpers)
+Reproduce:
+  python3 scripts/benchmark-restricted.py \
+    --runtime target/debug/velella-runtime \
+    --output artifacts/restricted-benchmark-new
+Evidence: artifacts/restricted-benchmark-20261020-debug/result.json.
+The measured runtime is the debug build with the v3 hash above, on this
+Linux 6.8 / 8-vCPU Intel Xeon host. Each case uses three warmups and 30 samples.
+Native/direct/adapter order rotates each round. Adapter timing waits on the
+actual process/closed notification, without adding the acceptance script's
+polling sleep. Outputs are checked and all temporary processes/files removed.
+
+Median wall milliseconds (native / restricted-exec / adapter RPC):
+  /bin/true:                    0.874 /   4.753 /  51.415
+  Python print(1):             20.690 /  24.749 /  73.366
+  fixed PBKDF2 CPU workload:  301.452 / 303.661 / 352.172
+  Python read 4 KiB:           31.348 /  34.840 /  82.786
+The separate fs/readFile RPC took median 58.590 ms (p95 73.603 ms).
+Adapter startup through initialize took 50–55 ms and is excluded from
+per-operation figures. The adapter process alone used about 15.5–15.9 MiB RSS
+after the workloads; this is not total Codex/app memory or peak tree memory.
+
+Observed direct-launch overhead is a few milliseconds, while the baseline
+Python adapter/helper path adds roughly 50 ms over native for each command.
+The tiny native/direct CPU difference is within the variability of this run;
+it does not establish an exact steady-state slowdown percentage. Small file
+operations pay a relatively large fixed RPC/helper-startup cost. Rust helpers,
+bounded batching or safely reusable confined workers are optimization options,
+not improvements implemented or measured at the time of this baseline.
+
+This is not an Orca A/B test. The native column is a direct subprocess baseline,
+not a measurement of Orca. It excludes real model latency, UI/app-server costs,
+release builds, concurrency throughput, cold caches and long-lived workloads.
+
+Native per-operation helpers — 2026-10-20
+The experimental adapter now invokes velella-runtime restricted-tool. This is
+an internal fresh-process entry point, sharing the exact enforce() function
+with restricted-exec: safe stdio checks, inherited-FD closure, capability drop,
+Landlock and seccomp. The probe remains v3 because the kernel policy did not
+change. Policy cwd remains the fixed work root. Requested command cwd is
+canonicalized and checked inside that root only after confinement; argv is
+then exec'd directly with a clean environment. Filesystem JSON requests are
+read and operated on inside the confined Rust process. The Python controller
+still owns protocol framing, output limits, cancellation and group reaping;
+there is no Python process-helper or filesystem-helper launch per operation.
+The adapter no longer grants its source directory implicit read access, and
+there is no legacy/host fallback if the native entry is unavailable or fails.
+
+The native FS helper preserves the 1 MiB file, 2 MiB frame and 4096 entry
+bounds; opens are nonblocking, optional final-component NOFOLLOW is honored,
+and write truncation happens only after confirming the opened object is a
+regular file. File URI, boolean and base64 validation is stricter than the
+Python prototype. Non-UTF8 directory names fail; validation errors have EINVAL
+(RPC -32600); recursive mkdir sets 0700 on all created components. Metadata
+createdAtMs retains the earlier Linux ctime convention, not birth time.
+Landlock does not hide stat metadata or symlink targets. Concurrent directory
+replacement can still change the initial cwd but cannot enlarge the installed
+Landlock permissions; this is not a directory-identity pinning guarantee.
+
+Review also removed a pre-confinement .tmp create-then-chmod race. mkdir now
+sets mode 0700 atomically, with no later path-based chmod that could follow a
+concurrently substituted symlink.
+
+Acceptance on the final debug runtime:
+  SHA256 819289122b9dca6e978e064889cb356a233388782eaa74fbeae5dcf772c001f8
+- artifacts/restricted-native-helper-kernel-v1/result.json: 51 checks passed.
+- artifacts/restricted-native-helper-direct-v1/result.json: 20 grouped protocol
+  checks passed, including native-entry cwd validation without the controller,
+  outside/readonly symlink writes without truncation, FIFO nonblocking failure,
+  Unicode URI and size limits, signal masks, removal of the script read grant,
+  cancellation, normal exit, EOF and output-backpressure descendant cleanup.
+- artifacts/restricted-native-helper-lifecycle-v1/result.json: daemon/PTy
+  cancellation and natural-exit cleanup both passed.
+- artifacts/codex-restricted-native-helper-v1/result.json: actual Codex CLI plus
+  fixed local Responses fixture passed all 25 assertions, including disconnect
+  error propagation and no host fallback. Sources/binaries remained unchanged;
+  owned processes and temporary directories were cleaned up.
+- cargo test -p velella --lib: 109 passed, 5 ignored, 0 failed. Ignored cases
+  require separate live environments; they are not counted as passing.
+
+These are Linux prototype checks, with no login or real-model calls. Desktop
+integration, account reuse, Windows/macOS isolation, cgroup/independent-guardian
+cleanup, resource quotas and full protocol support remain unfinished.
+
+Same-runtime before/after measurement
+The previous adapter and runtime/source snapshots were preserved before edits
+in artifacts/restricted-native-optimization-baseline/ (snapshot.json records
+SHA256). For the controlled comparison BOTH adapters used the final debug
+runtime above and the same benchmark script, three warmups and 30 samples per
+case/path. The old Python-helper adapter ran first, then the new native-helper
+adapter; no other task test/build ran during these timings. Within each run,
+native/direct/adapter order rotated per round. Host load was not held constant.
+
+Evidence:
+  artifacts/restricted-benchmark-python-helper-control-v1/result.json
+  artifacts/restricted-benchmark-native-helper-v1/result.json
+  artifacts/restricted-benchmark-native-helper-v1/comparison.json
+Both runs passed all output checks, source/runtime hash checks and cleanup.
+
+Adapter wall milliseconds, old median/p95 -> new median/p95:
+  empty_process              51.596 /   56.584 ->    4.925 /    6.229
+  python_short               71.286 /   75.944 ->   25.361 /   27.696
+  cpu_pbkdf2_400k           349.345 /  381.011 ->  301.477 /  337.700
+  read_4KiB_process          82.519 /   96.589 ->   36.011 /   39.763
+  read_4KiB_api              60.362 /   68.481 ->    4.734 /    5.786
+
+Empty-command median fell 90.5%, and 4 KiB FS RPC median fell 92.2%.
+The new empty-command RPC is 4.925 ms versus 4.343 ms direct restricted-exec
+and 0.787 ms unrestricted subprocess on this run. The improvement removes the
+extra interpreter startup while retaining a fresh confined child per operation.
+The roughly 300 ms CPU case is dominated by its own computation; small native
+versus restricted ordering differences are sampling/host variability, not
+proof the sandbox makes CPU execution faster.
+
+The Python controller is still long-lived: startup was 49-73 ms and excluded
+from per-operation timing; its after-workload RSS was 15.25-15.75 MiB. These are
+controller-only figures, not whole-app or process-tree peak memory. No inference
+about real-model, UI or Orca end-to-end speed follows from this benchmark.
+This remains a debug-build, sequential, warm-cache microbenchmark, without
+concurrency throughput, cold-start or release-build measurements.
+
+Reproduce the paired comparison with new output directories:
+  python3 scripts/benchmark-restricted.py \
+    --runtime target/debug/velella-runtime \
+    --adapter artifacts/restricted-native-optimization-baseline/restricted-exec-server.py \
+    --output artifacts/restricted-python-control-new
+  python3 scripts/benchmark-restricted.py \
+    --runtime target/debug/velella-runtime \
+    --output artifacts/restricted-native-new
+
+Desktop Restricted chat integration (2026-10-20)
+The workspace creation dialog now offers:
+  创建后 -> Codex 聊天 -> 执行模式 -> 受限工具（实验性/Linux）
+The default remains native. The UI reports kernel availability, explains the
+separate model/tool boundary and blocks unsupported folders or failed probes.
+This updates the source/build; no installed desktop application was replaced.
+
+workbench.terminal.open accepts sandbox={"mode":"restricted"} only for Codex
+chat in a non-task-owned Git worktree. Clients cannot select HOME, extra roots
+or networking. The daemon creates owned 0700 control state outside the worktree
+at <data-dir>/sandbox-chats/<session-id>. Only the worktree and its dedicated
+tool-home are writable to tools; the controller, launch/config files and model
+provider configuration are outside those roots. Restricted recovery is refused;
+repeated launch IDs cannot change execution mode. Browser MCP injection and
+permission escalation paths are disabled for this mode.
+
+The controller uses a fresh HOME/CODEX_HOME/TMPDIR. A new private profile copies
+only allowlisted fields for the selected Responses model provider, plus only
+environment variables explicitly named by that provider. Process-control names
+are rejected. Existing auth.json, keyrings, source hooks, MCP and skills are not
+copied. Existing account login alone is therefore insufficient; a supported
+model API configuration is needed. Controller networking supplies the model API;
+tool networking remains denied. The current compatibility gate is exact Codex
+CLI 0.153.4. Other versions fail without falling back to native execution.
+
+Project configuration is explicitly untrusted. This matters because the pinned
+Codex app-server auto-trusts a writable project if trust is unspecified, then
+reloads its .codex/config.toml. The host checks config/read before and after
+thread creation and before every send: project layers must be disabled, active
+nonempty layers must come only from the private user profile, and the generated
+profile bytes must remain unchanged. The private config-audit.json receipt holds
+only verification flags and counts, never provider settings or credentials.
+Each turn also names the same external environment and Restricted network policy;
+startup verifies that the local executor is absent and the external one is ready.
+
+Stopping first publishes an independent watchdog deadline, then sends SIGTERM
+through an identity-checked pidfd to the adapter so it can reclaim its tool
+process groups. The host closes Codex stdin afterward. An independent eight-second
+watchdog can kill the owned, unreaped Codex process group even when a protocol
+write or initialization is blocked. Group signaling is disabled before reaping.
+This covers cooperative adapter shutdown and a stalled CLI, not arbitrary
+SIGKILL/crash of the adapter or host; cgroup/independent-guardian work remains.
+
+Additional limits: Windows/macOS Restricted backends, existing account reuse,
+chat recovery and authenticated real-model acceptance remain unfinished. The
+main repository's Git metadata is not added as an extra readable root, so Git
+commands in a linked worktree may fail. No PID namespace, metadata hiding,
+resource quotas or complete exec-server protocol coverage is claimed. The
+workspace-skill traps exercise boundary denial, not proof that all untrusted
+instruction text is excluded from model context. No Orca end-to-end A/B or new
+performance claim follows from these desktop integration checks.
+
+Final desktop acceptance, debug runtime SHA256:
+  b53e4be2275cfa73811df1717a37c5b4c9802caee76a16b8a8827a9e19825923
+Actual CLI SHA256:
+  56ef98ab4032d317ab26e9b5e5a175650717351edb16ed9cde0cb6d1734d62da
+- artifacts/desktop-restricted-chat-v3/result.json: 111/111 checks passed.
+  This starts a real disposable desktop daemon, creates a real Git worktree,
+  opens chat through workbench.terminal.open, sends through
+  workbench.feedback.send and reads the real chat snapshots. Each of the three
+  scenarios uses actual Codex with exactly three fixed local Responses requests.
+  The real tool process passes 12 boundary assertions per scenario. Project
+  config stays disabled, the hostile fixture provider receives zero TCP
+  connections, and project MCP/hooks leave no execution markers.
+  Normal stop, adapter disconnect and stalled-CLI stop all reclaim captured
+  processes. Disconnect rejects a subsequent turn before another model request.
+  The stalled case pidfd-SIGSTOPs only the owned CLI, fills its stdin pipe using
+  its known /proc PID fd, submits a legal 64 KiB chat.send directly to that host,
+  verifies real pipe_write blocking, then stops via the desktop daemon. This
+  specific send path bypasses daemon feedback ordering; the stop is the actual
+  desktop route. Stop completes in 8.114 seconds and all captured CLI/adapter/
+  host/tool descendants exit. The forced-stop deadline is not normal latency.
+  Source/binary hashes remain unchanged; temporary state is removed with no
+  cleanup errors. The harness does not operate the desktop UI.
+- artifacts/restricted-desktop-kernel-v3/result.json: 51/51 checks passed.
+- artifacts/restricted-desktop-direct-v3/result.json: 20/20 grouped protocol
+  checks passed, including limits, symlink/FIFO behavior and cleanup. Both use
+  the identical final runtime, preserve hashes and clean their owned fixtures.
+- artifacts/restricted-desktop-rust-tests-v3.log: cargo test -p velella --lib,
+  116 passed, 5 ignored, 0 failed. A test-only ready-file publication race found
+  during the parallel run was fixed by atomic rename; production group handling
+  was unchanged by that fixture correction. Ignored tests are not passing tests.
+- artifacts/restricted-chat-ui/result.json: 8/8 mocked UI checks, including native
+  default, kernel failure, reprobe state and direct-folder rejection. Screenshots
+  are in that directory. These are separate UI fixtures, not a full GUI-to-model
+  acceptance run. Frontend unit suite passed 85 tests; final TypeScript/Vite
+  build output is artifacts/restricted-chat-frontend-build-v3.log.
+
+The failed v1/v2 artifacts are preserved. v1 exposed an incorrect HOME-field
+assumption in environment/info; the pinned CLI only returns cwd/shell there.
+HOME is instead fixed by private configuration/native validation and verified
+inside the actual tool. v2 exposed the app-server automatic-trust behavior;
+v3 adds explicit untrusted state, live layer audits and a separate hostile
+loopback provider to prove the project cannot redirect the model endpoint.
+All model responses in this acceptance are local fixtures, without login or
+real-model calls. Credential isolation evidence is fresh HOME/CODEX_HOME and a
+minimal environment, not a full syscall audit of controller reads.
+
+Reproduce using a new artifact directory and the pinned actual CLI executable:
+  python3 scripts/verify-desktop-restricted-chat.py \
+    --runtime target/debug/velella-runtime \
+    --codex /absolute/path/to/codex-0.153.4 \
+    --output artifacts/desktop-restricted-chat-new
+The harness never reads the user's Codex configuration or signs in. All Git,
+provider, daemon and process operations are bound to its disposable fixtures.
+
+Native Codex terminal correction (2026-10-20)
+---------------------------------------------
+The user requires the original interactive terminal, not a separate chat panel.
+WorkspaceComposer now offers Restricted tools under "Codex 终端 / 受管任务"
+when opening an interactive terminal. The newly introduced "Codex 聊天" creation
+option is removed; existing chat session display remains compatible.
+
+Entry: 全部工作区 -> Git project name's + -> 创建后: Codex 终端 / 受管任务 ->
+执行模式: 受限工具（实验性/Linux）. This still requires a new, non-task-owned
+Git worktree. A selected Restricted policy cannot silently become a managed task
+or native execution. Native launch behavior remains the default.
+
+workbench.terminal.open now accepts launch="codex", sandbox={"mode":"restricted"}.
+The descriptor uses adapter="codex-restricted-terminal", kind="terminal",
+native_chat=false and input_protocol=1. The existing PTY, xterm, byte recordings,
+keyboard input, resize, stop and historical playback handle the actual native
+Codex TUI. No chat messages are converted into terminal-looking output.
+
+The native ELF is resolved from PATH or the installed official npm package and
+must report Codex CLI 0.153.4. The controller has fresh private HOME/CODEX_HOME,
+an explicit --cd worktree, fixed CLI security overrides, untrusted work/controller
+roots, and only the fixed external environment (include_local=false). Provider
+values stay in the private config file rather than command-line arguments.
+Before the TUI starts, a bounded read-only configuration audit uses a separate
+private profile copy and an executor-free registry; it rejects active external
+config layers, requirements, added executable integrations and altered provider
+data. This audit does not start the live executor or any model thread.
+
+Codex's internal "YOLO mode" label is its built-in permission profile; the app
+tab explicitly says "工具受限". The separate executor still enforces the fixed
+Landlock/seccomp filesystem and denied-network policy. TUI permissions cannot
+register a missing local environment or change that fixed executor policy.
+
+Stopping suspends and confirms the actual native controller first, lets the
+owned executor clean up its independent tool process groups, then terminates
+the pinned controller group before reaping. Natural exit uses WNOWAIT to retain
+ownership through cleanup. Duplicate cancellation shares one cleanup attempt.
+
+Verification:
+- artifacts/desktop-restricted-terminal-v1/result.json: 46/46 checks passed,
+  including 12 real tool boundary checks, poisoned project config/MCP/hooks,
+  original terminal I/O and resize, launch idempotency, downgrade/recovery refusal,
+  and active parent/child/grandchild cleanup. Desktop stop took 0.402 seconds in
+  this single local run; this is not a general performance benchmark.
+- Real-browser evidence:
+  artifacts/browser-restricted-terminal-20261020-v1/
+  The browser created a new worktree and restricted native terminal, typed Chinese
+  through actual keyboard input, submitted it, displayed the fixed response, and
+  stopped the process through its original menu. History remained visible.
+- Rust library: 126 passed, 6 explicitly ignored; the separately enabled real-CLI
+  configuration-audit suite passed 6/6, and lifecycle tests passed 6/6.
+- Frontend: 89 unit tests, typecheck and build passed; 26 complete-WorkspaceApp
+  browser checks used an in-memory error fixture, separate from real CLI testing.
+
+Historical v1 limitation (fixed by the bridge described below): native CLI
+0.153.4's !shell required the disabled local environment and exited the TUI.
+The original v1 evidence is retained; it is not the current behavior.
+This remains experimental Linux support; real models, login, Windows/macOS
+backends and Restricted session recovery are not established by this acceptance.
+No installed desktop application was replaced.
+
+Reproduce without login or a real model:
+  python3 scripts/verify-desktop-restricted-terminal.py \
+    --runtime target/debug/velella-runtime \
+    --codex /absolute/path/to/native-codex-0.153.4 \
+    --output artifacts/desktop-restricted-terminal-new
+The --browser option instead keeps a disposable backend until its output
+directory receives cleanup.request; browser assertions are recorded separately.
+
+
+Native terminal !command bridge correction (2026-10-20)
+-------------------------------------------------------
+The exact installed Codex 0.153.4 source defines thread/shellCommand as a
+local-host escape hatch. It requires environments.local() and constructs an
+unsandboxed host ExecRequest. With include_local=false, app-server rejects this
+RPC; the TUI propagates the error and exits. Enabling local execution would
+bypass the fixed policy and is not a compatibility fix.
+
+Velella now retains the unmodified native ELF/TUI using --remote over a private
+Unix WebSocket to the same native app-server. The trusted bridge adapts only the
+user-shell execution path to another instance of the fixed restricted executor.
+Both manual commands and model-requested commands enter restricted-tool and
+keep the same directory allowlist, private HOME and denied networking.
+
+The socket is 0600 in a fresh 0700 /tmp/vl-tui-* directory outside tool-writable
+roots. An explicit RPC allowlist fixes thread/work/environment/sandbox fields
+and, at this historical bridge baseline, rejected host command/FS APIs,
+configuration writes, resume/fork, arbitrary
+local attachments and external history injection. Internal history requests
+use reserved IDs. A following model turn waits until thread/inject_items has
+acknowledged the user-shell result; shell commands themselves call no model.
+Original command output and turn events are shown by Codex itself. Existing PTY
+recordings retain the terminal history. At this baseline Restricted recovery
+was disabled. The later same-thread implementation below supersedes that
+restriction; it preserves injected model context and the PTY recording without
+claiming that app-server rebuilds each synthetic command card.
+
+Stopping freezes the native TUI, bridge and app-server request producers before
+letting both executors clean their independent tool groups. Pinned process IDs
+and WNOWAIT preserve ownership until termination/reaping. A parent stdin lease
+also triggers bridge cleanup when the host dies. Socket cleanup only removes
+the original owned inode and an empty private temporary parent directory.
+
+Resource bounds are explicit: a manual command defaults to 120 seconds and
+256 KiB output; at most 64 manual commands can execute per shell-adapter instance.
+A timeout, output overflow or the 65th command creates a failed command item,
+keeps the TUI available, and does not bypass the sandbox. Start a new restricted
+terminal at this limit. A successfully recovered terminal has fresh adapters,
+while retaining the model thread. Esc cancels an active manual command.
+
+Validation is recorded separately from the retained v1 baseline. The suite
+scripts/test-restricted-terminal-bridge.py covers transport/policy limits,
+queued input and cancellation, multi-page UTF-8 output, acknowledged history,
+short timeout, output overflow and the command cap. The real native terminal
+suite also exercises boundary checks, pipes, redirects, nonzero exits, continued
+input, three-generation process cancellation, and model-visible command history.
+All model responses in this acceptance are fixed loopback fixtures; no login or
+real inference, host policy changes or installed-app replacement are performed.
+Linux x86_64/aarch64 and pinned CLI 0.153.4 remain the supported experimental
+scope. Windows/macOS backends need their own implementation and validation.
+
+Final correction acceptance:
+- artifacts/desktop-restricted-terminal-shell-v3/result.json: 102/102 passed.
+  Actual shell output reached the next upstream fixture request; all 12 kernel
+  boundary checks passed for both model tools and manual commands. Host SIGKILL
+  lease cleanup removed the live three-generation tree and private socket.
+- scripts/test-restricted-terminal-bridge.py: 20/20 protocol tests passed.
+  Timeout uses 20ms with a mock executor; it is not a native 120-second run.
+- artifacts/browser-restricted-terminal-shell-20261020-v2/browser-ui-result.json:
+  actual browser keyboard input ran three manual commands (success, exit 7,
+  success), then displayed one fixed model response. Original stop/history UI
+  worked; no browser warnings/errors. Backend, processes, private socket and
+  temporary directory were cleaned; browser tab and Vite were closed.
+- Rust library: 126 passed, 6 ignored; related frontend unit tests: 4 passed.
+  Rust checks/runtime build and frontend typecheck/build passed.
+
+Existing local ChatGPT login for the native terminal (2026-10-20)
+---------------------------------------------------------------
+The restricted native terminal can reuse an existing file-backed ChatGPT login
+for the built-in OpenAI provider. This does not copy auth.json into the private
+controller or tool HOME. Custom providers, including an overridden "openai"
+provider, never receive these credentials automatically.
+
+Rust selects only an owned, private, bounded regular auth.json outside writable
+tool directories. The private bridge repeats the checks on every read, initializes
+the native app-server, and internally uses its pinned 0.153.4 chatgptAuthTokens
+RPC to set process-local authentication. Only the access token and account ID
+cross the private stdio channel. The refresh token and ID token are not forwarded;
+source auth.json is not modified. Client login/logout RPCs remain blocked.
+
+If app-server requests a token refresh, the bridge only rereads the same source
+and requires the same account. It does not refresh OAuth credentials itself.
+An expired login that the local Codex client has not renewed therefore still
+requires renewed local login state. Authentication errors are generic; credential
+values are excluded from argv, tool environments, diagnostics and test receipts.
+
+This is the fixed upstream version's internal external-auth protocol, not a
+claim of compatibility with arbitrary Codex versions. Authentication is limited
+to the original terminal adapter; it does not enable the separate chat panel.
+The model controller also inherits exactly the eight standard HTTP(S)/ALL/NO
+proxy environment variables, upper and lower case, from the trusted host.
+Workspace/provider configuration cannot supply them. Values are bounded, not
+logged, and never passed into the tool environment. TLS verification is retained.
+
+Live acceptance passed:
+  artifacts/browser-real-model-terminal-20261020-v3/result.json
+Actual gpt-6-astra with the built-in OpenAI provider reused the local ChatGPT
+login and completed a clamp.py repair through the original native terminal.
+Three real tool calls returned; the model's six tests and a separate fixed
+six-test suite inside the same sandbox passed. All 14 boundary checks passed,
+including denied auth-file open and no proxy environment inside tools.
+The real model turn took 14.36 seconds in this single sample, not a benchmark.
+The browser used the existing stop menu and displayed terminal history.
+Temporary processes, socket, files, browser tab and Vite were cleaned.
+
+The v1/v2 real-provider evidence directories retain failed intermediate attempts:
+v1 was a harness status=None startup race; v2 omitted the host's required proxy.
+Neither failure is presented as a successful real-model run.
+Offline validation: 30 bridge protocol tests, 7 Rust chat-sandbox tests and
+4 related frontend tests passed; runtime and frontend builds passed.
+No installed desktop application was replaced.
+
+Current native terminal: tools and same-thread recovery (2026-10-20)
+------------------------------------------------------------------
+This section supersedes the no-recovery and missing-rg limitations in earlier
+native-terminal acceptance records. The implementation remains experimental,
+Linux-only and pinned to the actual Codex CLI 0.153.4 executable. It does not add
+Windows/macOS enforcement, tool networking, attachments, MCP or plugin execution,
+and it does not replace the user's installed desktop application.
+
+Restricted commands can resolve rg, node, git and python3 from fixed system
+package locations. Discovery does not search the host's inherited PATH. Each
+resolved executable and its ancestor directories must be root-owned and not
+writable by ordinary users. Exact aliases are placed in a private directory
+outside every tool-writable root, with a read-only Landlock rule, followed by a
+fixed system PATH. Modified aliases, extra entries, symlink directories and
+writable overlaps are rejected rather than repaired or executed. This makes
+existing trusted tools visible; it does not install software or broaden network
+permissions. OPENSSL_CONF is fixed to /dev/null for these tool processes.
+
+The original Stop and Recover controls can resume the same saved model thread,
+using the same workspace, private CODEX_HOME and fixed external environment.
+This is recovery of a known native thread ID, not merely another terminal with
+the same title. A private atomic terminal-resume.json records the canonical
+thread ID, generation, workspace, CODEX_HOME, fixed CLI version, ChatGPT account
+hash, history_ready and shell-history status. Only an admitted native thread/start or
+thread/resume success establishes a binding. Before resume, only a metadata
+lookup of that exact ID is permitted; execution is admitted only after the
+native resume succeeds. Arbitrary history/path imports, cross-thread requests,
+forking and client-supplied configuration or permission overrides stay blocked.
+
+Recovery reuses only byte-matching fixed controller config, environment registry,
+executor configuration and embedded scripts. Local execution remains absent:
+include_local=false and the default environment are fixed, and every subsequent
+model turn explicitly selects velella-restricted. The original ChatGPT account
+hash is checked before private external-auth login; changing account or provider
+profile cannot silently send old history through a different identity/provider.
+No source auth file or refresh token is copied into the controller or tool HOME.
+
+Manual !commands mark shell history dirty before execution. The bridge clears
+that flag only after native thread/inject_items acknowledges the saved command
+and result. A later model request waits for this acknowledgement. A new empty
+thread starts with history_ready=false: thread/start alone does not materialize
+a rollout in 0.153.4. A successful shell injection, or a model completion followed
+by an acknowledged internal persistent history read, marks it ready. Empty
+terminals therefore have history playback but no model recovery action. The pinned
+native app-server persists even the first shell result before any model turn;
+an independent no-model restart check confirms the same ID can resume and accept
+further history. Recovery does not replay a pending command. A dirty checkpoint,
+missing history, missing/mismatched generation, or unconfirmed cleanup refuses
+recovery; SIGKILL/crash recovery is not enabled. Saved terminal bytes remain
+available for historical playback even when model recovery is unavailable.
+
+Normal stop freezes request producers, terminates the owned tool groups and
+waits for both relevant adapters. Each adapter writes its own private cleanup
+receipt only after its recorded processes and operations finish; PID and /proc
+start-time bind that receipt to the expected adapter. Rust checks those receipts
+before publishing terminal-stopped.json for the current generation. A vanished
+adapter or a zero exit status alone cannot establish that tool cleanup finished.
+The previous stop marker is invalidated before the next generation starts.
+
+The host can leave a Unix endpoint after exit. Recovery first holds owner.lock;
+listen_recovering then reclaims only a current-user-owned socket that no longer
+accepts connections, retaining the saved descriptor/history. The bridge's
+separate private socket is removed during normal cleanup. The viewer is
+recreated on confirmed exit or a changed host PID, drops old input queues and
+replays geometry before negotiating live resize.
+Input/resize/control requests carry the viewer's expected host PID; the host
+rejects stale requests rather than applying them to the recovered process.
+
+The native TUI remains interactive, but each !command itself is non-interactive:
+default timeout 120 seconds, maximum output 256 KiB and 64 executed manual
+commands per shell adapter. Timeout/output-limit/cap failures remain visible
+without changing the execution policy. These limits are not a general CPU,
+memory or disk quota, and a tool subprocess still has no model-service network.
+
+Final offline integration snapshots share runtime SHA256:
+  f0aa1804e048ca3e8c51b263dfc61303c1a53da58110b21c9ede35b5833d8421
+- artifacts/restricted-tools-20261020-v4/result.json: 64/64 real launcher
+  assertions passed for first use and reuse, trusted rg/node/git/python3,
+  immutable aliases, substituted-alias refusal, clean environment and denied
+  outside/auth/network access. No real model was used.
+- artifacts/restricted-terminal-recovery-20261020-v6/result.json: 84/84 checks
+  passed, preserving one native thread through two normal-stop recoveries.
+  A shell-only first history was present in the resumed fixed model request;
+  resumed model tools and resumed manual tools each passed 12 kernel-boundary
+  checks, and rg worked in the native terminal. A changed provider profile was
+  rejected. An empty thread was not recoverable and recovery was refused before
+  spawning; both recovered generations rejected stale-PID input, resize and
+  control requests. Recorded processes and temporary directories were removed, with
+  unchanged source/binary hashes and no cleanup errors. This used a fixed local
+  response service, not real inference. The earlier v5 snapshot remains retained.
+- artifacts/restricted-terminal-final-20261020-v1/result.json: 101/101 native
+  terminal checks passed on the same runtime. Coverage includes native TUI and
+  app-server roles, model/manual boundary probes, Chinese and piped output,
+  nonzero-exit recovery, Esc cancellation of three generations, recorded resize,
+  original stop, SIGKILL stdin-lease cleanup and absence of host fallback.
+  Source/binary hashes stayed unchanged; cleanup finished without errors.
+- Final Rust library validation passed 135 tests with 6 explicitly ignored;
+  bridge tests passed 44/44, executor acceptance 28 checks, and related frontend
+  tests 23. The frontend production build passed with its existing chunk-size
+  warning. Ignored cases are not passing tests.
+- scripts/test-native-injected-history.py passed against the actual 0.153.4
+  executable with a temporary profile: first injected history persisted, the
+  same ID resumed after an app-server restart, and new history appended without
+  duplicating the old item. No account or model request was used.
+
+Reproduce the two no-model integrations with new output directories:
+  python3 scripts/verify-restricted-tools.py \
+    --runtime target/debug/velella-runtime --output artifacts/restricted-tools-new
+  python3 scripts/verify-desktop-restricted-recovery.py \
+    --runtime target/debug/velella-runtime \
+    --codex /absolute/path/to/native-codex-0.153.4 \
+    --output artifacts/restricted-terminal-recovery-new
+
+Real-model browser recovery acceptance passed:
+  artifacts/browser-real-recovery-20261020-v3/
+The real gpt-6-astra/OpenAI provider reused the existing ChatGPT account through
+the original browser terminal, on the same final runtime hash above. The first
+model turn repaired clamp.py and passed its six tests; the separate fixed
+six-test verification also passed. The original checkout and tests stayed fixed.
+
+The browser then printed a random RECOVERY_MEMORY_ line with a manual !printf
+command, without writing it into the workspace, used the normal Stop/Recover
+menus, and submitted a new prompt that did not contain that random value. The
+native thread ID stayed the same; generation, host, native TUI and app-server
+were new. A new assistant reply reproduced the old line and a real exec_command
+ran both rg over clamp.py and the original unittest suite. Function calls and
+outputs increased from 3/3 to 4/4: the recovered tool call combined those commands.
+The new completion marker and completed model turn were recorded.
+
+After recovery, fresh proofs passed all 14 kernel/environment boundaries and
+the independent six tests again. Old proof files were moved out before the new
+checks. Candidate source and fixed controller profile remained unchanged;
+neither controller HOME nor tool HOME contained an auth.json copy. Tool network
+restrictions remained in force.
+
+geometry-result.json records the old geometry intact, followed by a new-process
+reset and automatic recovery to the same window's 54 rows by 92 columns. This
+was normal browser resize negotiation, not a harness-forced backend resize.
+
+result.json reports 48/48 checks, real_model_verified=true and
+real_model_recovery_verified=true. Source/runtime hashes stayed unchanged,
+outside fixture contents were unchanged, network probe connections were zero,
+temporary state was removed and cleanup_errors was empty.
+browser-ui-result.json separately reports 16/16 browser/cleanup assertions.
+The model prompt, manual probes/memory and recovered commands used browser
+keyboard input; the first independent check was triggered by verify.request.
+Recorded backend processes and bridge sockets were cleaned, the browser tab
+was closed and Vite stopped. Before cleanup, browser warnings/errors were empty.
+
+Primary evidence:
+- recovery-verification-complete.json and real-browser/recovery-before.json /
+  recovery-started.json: preserved thread, changed generation/host, remembered
+  output, new model tools and fresh verification results.
+- geometry-result.json: preserved prior records and restored window dimensions.
+- 05-resumed-model-memory-and-tests.png: recovered model memory and tool output.
+- 06-recovered-independent-tests.png: fresh independent verification.
+07-cleanup-disconnect.png shows the expected disconnect after intentionally
+stopping the owned fixture daemon; it is not the successful verification screen.
+
+Failed intermediate runs remain separate. browser-real-recovery-20261020-v1
+selected an ordinary terminal and was rejected before any model attempt.
+v2 completed the real repair/model tests but a greater-than-1024-character
+inline !command became native pasted content; independent verification timed
+out, so the whole run failed. Both temporary environments were cleaned.
+The v3 harness stages exact fixed shell bodies as 0444 files in private tool
+HOME, then submits short !/bin/bash "$HOME/...sh" commands. Hash receipts and
+eight passing offline harness tests cover preservation/reuse of those fixtures
+and rejection of modifications/links. No workspace file, production sandbox
+exception or native Codex patch was added for this input correction.
+
+2026-10-20: Codex terminal entry in existing workspaces
+
+Choose "新建 Codex 终端" from the workspace overview or the top + menu.
+Restricted tools are selected by default; native execution requires an explicit
+selection. Existing and imported Git worktrees are eligible for restricted
+execution only when no task record shares their path. Native execution is blocked
+by tasks at the same path except those in queued, cancelled or delivered phases.
+Retries retain the request UUID, execution mode and any created session. If
+opening its tab fails, retry reads the latest layout revision and reuses the
+session's tab instead of launching another process. The "Codex · 工具受限" label
+identifies restricted sessions; "可恢复" takes precedence over "已结束" when saved
+history and normal cleanup permit recovery. Linux, CLI-version and permission
+boundaries remain unchanged. These source changes have not replaced the
+installed application package.

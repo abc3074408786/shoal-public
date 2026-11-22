@@ -1,0 +1,30 @@
+/* xterm updates inline coordinates on every TUI repaint. Pin only an active
+ * composition; both the visible preedit and the native IME use this anchor. */
+.xterm[data-terminal-composing] .xterm-helper-textarea {
+  inset-inline-start: var(--terminal-ime-inline) !important;
+  inset-block-start: var(--terminal-ime-block) !important;
+  max-inline-size: var(--terminal-ime-screen-width) !important;
+}
+.xterm[data-terminal-composing] .terminal-ime-preedit {
+  position: absolute;
+  z-index: 5;
+  white-space: pre;
+  overflow: clip;
+  pointer-events: none;
+  color: var(--terminal-fg);
+  background: var(--terminal-bg);
+  text-decoration: underline;
+  inset-inline-start: var(--terminal-ime-view-inline) !important;
+  inset-block-start: var(--terminal-ime-block) !important;
+  max-inline-size: var(--terminal-ime-view-width) !important;
+}
+@font-face {
+  font-family: 'Velella Nerd Font Symbols';
+  src: url('/fonts/SymbolsNerdFontMono-Regular.woff2') format('woff2');
+  font-display: swap;
+}
+.terminal-settings { display: grid; gap: 1rem; }
+.terminal-settings label { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.terminal-settings :is(input:not([type='checkbox']),select) { inline-size: min(18rem,55%); }
+.terminal-settings :is(input,select):focus-visible { outline: 2px solid var(--accent,oklch(70% .12 165)); outline-offset: 2px; }
+.terminal-renderer-status { font-size: .75rem; color: var(--text-muted,oklch(65% 0 none)); }

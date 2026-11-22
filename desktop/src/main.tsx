@@ -1,0 +1,13 @@
+import React from 'react';
+import {createRoot} from 'react-dom/client';
+import WorkspaceApp from './WorkspaceApp';
+import './style.css';
+import './theme.css';
+import './orca-shell.css';
+import './motion.css';
+import {AppearanceProvider} from './Appearance';
+import {TooltipProvider} from './ui';
+import {parseTheme,readPreference} from './ui-preferences';
+import {ConfirmationProvider} from './ConfirmAction';
+document.documentElement.dataset.theme=parseTheme(readPreference('velella:ui:theme','dark'));
+createRoot(document.getElementById('root')!).render(<React.StrictMode><AppearanceProvider><TooltipProvider><ConfirmationProvider><WorkspaceApp/></ConfirmationProvider></TooltipProvider></AppearanceProvider></React.StrictMode>);

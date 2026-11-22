@@ -1,0 +1,26 @@
+.capabilities-dialog { inline-size:min(850px,94vw); max-block-size:88dvh; overflow:clip; }
+.capabilities-dialog[open] { display:flex; flex-direction:column; }
+.capabilities-dialog>.dialog-heading,.capabilities-dialog>.capability-tabs { flex-shrink:0; }
+.capability-tabs,.capability-row { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+.capability-tabs { padding:12px 20px; border-block-end:1px solid var(--border); }
+.capability-tabs [aria-pressed="true"] { background:var(--accent); color:var(--foreground); }
+.capability-content { display:flex; flex-direction:column; gap:16px; overflow:auto; min-block-size:0; }
+.capability-content form { display:flex; flex-direction:column; gap:12px; }
+.capability-content label { display:flex; flex-direction:column; gap:6px; font-size:13px; }
+.capability-content label.ack { flex-direction:row; align-items:flex-start; justify-content:flex-start; }
+.capability-content label.ack input { inline-size:16px; block-size:16px; flex:0 0 16px; margin:0; }
+.capability-content select { background:var(--background); color:var(--foreground); border:1px solid var(--border); border-radius:5px; padding:7px; max-inline-size:100%; }
+.capability-content h3 { margin:0; font-size:14px; }
+.capability-content pre { white-space:pre-wrap; overflow-wrap:anywhere; padding:12px; background:var(--muted); font-size:12px; }
+.capability-content :focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+.capability-content button:active { background:var(--accent); }
+.capability-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr)); gap:12px; }
+.capability-grow { flex:1; min-inline-size:min(100%,260px); }
+.capability-list { display:flex; flex-direction:column; }
+.capability-item { display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding-block:10px; border-block-end:1px solid var(--border); }
+.capability-item>div { flex:1; min-inline-size:min(100%,240px); overflow-wrap:anywhere; }
+.capability-item small { display:block; color:var(--muted-foreground); margin-block-start:4px; }
+.capability-note { color:var(--muted-foreground); font-size:13px; line-height:1.6; margin:0; }
+.capability-history { max-block-size:240px; overflow:auto; padding-inline-start:0; list-style:none; }
+.capability-history button { text-align:start; overflow-wrap:anywhere; }
+.capability-section { border:1px solid var(--border); padding:12px; border-radius:6px; }

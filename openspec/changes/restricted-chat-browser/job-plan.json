@@ -1,0 +1,40 @@
+{
+  "admission": "ready",
+  "jobId": "dynamic-web-verification",
+  "kernel": [
+    "foundation",
+    "toolchain"
+  ],
+  "next": [
+    {
+      "action": "check",
+      "command": "foundation",
+      "required": true,
+      "role": "kernel"
+    },
+    {
+      "action": "resolve",
+      "command": "toolchain",
+      "required": true,
+      "role": "kernel"
+    },
+    {
+      "action": "capture",
+      "command": "evidence",
+      "required": true,
+      "role": "primary"
+    }
+  ],
+  "planSha256": "0960d12003da17816547d76f11abb6270da1de926502e9ffadf13bf70a28ad99",
+  "primaryKnowledge": {
+    "action": "capture",
+    "admission": "ready",
+    "command": "evidence",
+    "id": "dynamic-web-verification"
+  },
+  "query": "dynamic web verification: test existing Velella desktop web frontend worktree creation and Restricted Codex chat navigation with isolated runtime and browser screenshots",
+  "registrySha256": "9728e5cf6a74f78e7b89332295f205a5503e94633d24c62a32ed48698fe5349d",
+  "routeSha256": "fd299dd3ab8a55b0a87557d8fcf2e36b1643571115945c29a055e79b38572fcd",
+  "schema": "design-pipeline.job-plan.v1",
+  "secondaries": []
+}

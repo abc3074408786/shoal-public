@@ -1,0 +1,9 @@
+.browser-native-slot:has(> .browser-placeholder:empty)::after {
+  content: "示例浏览器页面 · 可查看地址栏、访问历史和模拟页面快照";
+  display: grid;
+  place-items: center;
+  min-block-size: 100%;
+  padding: 2rem;
+  color: var(--muted-foreground);
+  text-align: center;
+}

@@ -1,0 +1,50 @@
+[
+  {
+    "agent": "codex",
+    "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/codex-color.svg",
+    "bytes": 1769,
+    "sha256": "4a2f43ce46b5b6e3722c95088f88d26ef91e6a8c2e598e70642a1c54367386e4"
+  },
+  {
+    "agent": "claude-code",
+    "url": "https://claude.com/icon.svg",
+    "bytes": 2558,
+    "sha256": "b150888bc7257af83e3b85d3c2be4294f88986026f8168f6c12fc1fde6697350",
+    "source": "Claude official website starburst; same mark as Orca agent icon"
+  },
+  {
+    "agent": "gemini",
+    "url": "https://www.gstatic.com/lamda/images/gemini_sparkle_4g_512_lt_f94943af3be039176192d.png",
+    "bytes": 61823,
+    "sha256": "5e7cfecaa53f4f65a313fe89b0f389548126544a78fad8489510c70ae641a4a1",
+    "source": "Gemini official website favicon",
+    "reference": "https://gemini.google.com/"
+  },
+  {
+    "agent": "opencode",
+    "bytes": 286,
+    "sha256": "9b3a735daa56f9f22b31ce5ee92122e1958b8e54eac6251ef9896c911a4c7a90",
+    "source": "Orca desktop agent-catalog inline SVG, agent=opencode",
+    "reference": "https://opencode.ai"
+  },
+  {
+    "agent": "kimi",
+    "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/kimi.svg",
+    "bytes": 786,
+    "sha256": "ed08131b46acf70e6e2144eceb775e74098b58ea65fa21eaee04be7b05cfe63b"
+  },
+  {
+    "agent": "omp",
+    "bytes": 437,
+    "sha256": "c30c9c22928fd26438b191b6786b213d302c03bfd0921ce37c826acfd78175b4",
+    "source": "Orca desktop agent-catalog inline SVG, agent=omp",
+    "reference": "https://omp.sh"
+  },
+  {
+    "agent": "zcode",
+    "source": "installed official desktop icon",
+    "url": "https://github.com/zai-org/ZCode/blob/main/packages/desktop/build/icon.png",
+    "bytes": 215707,
+    "sha256": "edd87a182097389b0f59c07f8de283dbe433c9d37cd6e9a2a372611516ab81eb"
+  }
+]

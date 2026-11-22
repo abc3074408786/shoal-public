@@ -1,0 +1,126 @@
+/* User-selected desktop shell. Terminal/editor palettes remain independently owned. */
+html:root:has(.project-shell){
+  --font-sans:'Geist Variable','Microsoft YaHei UI','Segoe UI',sans-serif;
+  --background:light-dark(#ffffff,oklch(18% 0 none));
+  --foreground:light-dark(oklch(25% 0 none),oklch(94% 0 none));
+  --card:light-dark(oklch(100% 0 none),oklch(23% 0 none));
+  --muted-foreground:light-dark(oklch(46% 0 none),oklch(72% 0 none));
+  --secondary:light-dark(oklch(94% 0 none),oklch(26% 0 none));
+  --border:light-dark(oklch(89% 0 none),oklch(32% 0 none));
+  --primary:light-dark(oklch(43% .025 160),oklch(80% .025 160));
+  --worktree-sidebar:light-dark(#ffffff,oklch(20% 0 none));
+}
+.ide-shell.project-shell{--wb-text:var(--foreground);--wb-bg:var(--background);--wb-sidebar:var(--worktree-sidebar);--wb-panel:var(--card);--wb-line:var(--border);--wb-muted:var(--muted-foreground);grid-template-rows:40px minmax(0,1fr);border:1px solid var(--border);border-radius:12px;overflow:clip;letter-spacing:0}
+.ide-shell.project-shell>.app-titlebar{grid-column:1/-1;grid-row:1;block-size:40px;padding-inline:15px 0;gap:6px;border:0;background:var(--background)}
+/* Merged titlebars must keep the sidebar controls outside the draggable tab strip. */
+.ide-shell.left-hidden>.terminal-split-titlebar .terminal-titlebar-left{position:static}
+.ide-shell.left-hidden>.terminal-split-titlebar .workspace-terminal-strip{padding-inline-start:0}
+.project-shell .app-titlebar button{border:0;border-radius:0;min-inline-size:30px;min-block-size:40px;padding:0;align-self:stretch}
+.shell-history,.shell-menus{display:flex;align-items:stretch;flex:none}
+.project-shell .shell-menus button{min-inline-size:50px;padding-inline:8px;font-size:13px;font-weight:400}
+.project-shell .workbench-window-drag{flex:1;min-inline-size:12px}
+.ide-shell.project-shell>.app-titlebar .window-controls{align-self:stretch;gap:0;margin:0}
+.ide-shell.project-shell>.app-titlebar .window-controls button{inline-size:46px;block-size:100%;border:0;border-radius:0;background:transparent}
+.ide-shell.project-shell>.ide-sidebar{grid-row:2;grid-column:1;padding:22px 14px;gap:0;background:var(--worktree-sidebar);border-right:1px solid var(--border)}
+.project-shell .workbench-navigation{gap:0;margin:0}
+.sidebar-projects{margin-block-start:24px;min-block-size:0;overflow:auto;flex:1}
+.sidebar-projects-heading,.sidebar-content-heading{display:flex;align-items:center;justify-content:space-between;min-block-size:30px;font-size:11px;color:var(--muted-foreground);padding-inline:10px 2px}
+.sidebar-projects-heading button,.sidebar-content-heading button{min-block-size:28px;min-inline-size:28px;padding:4px;border:0;background:transparent}
+.sidebar-project{margin-block-end:8px;min-inline-size:0}
+.project-shell .sidebar-project-name,.project-shell .sidebar-content-item,.project-shell .sidebar-workspace-name{display:flex;align-items:center;gap:8px;inline-size:100%;min-inline-size:0;min-block-size:32px;padding:7px 10px;border:0;border-radius:6px;background:transparent;text-align:start;font-size:12px;font-weight:400;color:var(--muted-foreground)}
+.sidebar-project-name>span,.sidebar-content-item>span{overflow:clip;white-space:nowrap;text-overflow:ellipsis;min-inline-size:0}
+.sidebar-project-name>svg,.sidebar-content-item>svg{flex:none}
+.project-shell .sidebar-project-name.selected{color:var(--foreground);font-weight:550}
+.sidebar-project-contents{margin-inline-start:8px;padding-inline-start:6px;border-inline-start:1px solid var(--border)}
+.sidebar-content-list{list-style:none;padding:0;margin:0}
+.sidebar-content-empty{font-size:11px;color:var(--muted-foreground);margin:4px 10px 10px}
+.project-shell .sidebar-content-item[aria-current=true],.project-shell .sidebar-content-item:active,.project-shell .sidebar-project-name:active,.project-shell .sidebar-workspace-name:active{color:var(--foreground);background:var(--secondary)}
+.sidebar-projects button:focus-visible{outline:2px solid var(--foreground);outline-offset:-2px}
+@media(hover:hover) and (pointer:fine){.project-shell .sidebar-projects button:hover:not(:disabled){background:var(--secondary);color:var(--foreground)}}
+.ide-shell.project-shell .ide-nav{min-block-size:40px;padding:9px 12px;gap:10px;border:0;border-radius:6px;font-size:13px;font-weight:400;color:var(--muted-foreground)}
+.ide-shell.project-shell .ide-nav.selected{background:var(--secondary);font-weight:400;color:var(--foreground)}
+.project-shell .ide-main{display:flex;flex-direction:column;min-block-size:0;padding:0;background:var(--background)}
+.project-heading-row{display:flex;align-items:center;gap:12px;min-block-size:44px;padding-inline:16px 12px;border-bottom:1px solid var(--border);flex:none;min-inline-size:0}
+.project-heading-row>strong{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.project-heading-row>span{color:var(--muted-foreground);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.project-tools{margin-inline-start:auto;display:flex;align-items:center;min-inline-size:0}
+.project-tools .chrome-actions{display:flex;align-items:center;gap:2px;min-inline-size:0}
+.project-tools .chrome-actions button{min-inline-size:30px;min-block-size:32px;padding:4px;border:0;background:transparent}
+.project-tools .empty-tools> :not(.workspace-tools-toggle):not(.workspace-task-indicator):not(.workspace-session-history){display:none}
+.project-shell .shell-page-chrome{flex:none;display:flex;align-items:stretch;min-inline-size:0;min-block-size:36px;border-bottom:1px solid var(--border)}
+.project-shell .shell-page-chrome:empty,.project-shell .shell-page-chrome:has(>.chrome-workspace-name):not(:has(.ide-tabs)){display:none}
+.project-shell .shell-page-chrome .ide-tabs{flex:1;min-inline-size:0;overflow-x:auto}
+.project-shell .shell-page-chrome .ide-tab{max-inline-size:220px;min-inline-size:96px}
+.project-shell .wb-body{flex:1;min-block-size:0;background:var(--background)}
+.project-shell .project-empty-workspace{flex:1;min-block-size:0;display:grid;place-items:center;padding:24px;background:var(--background)}
+.project-shell .project-empty-workspace>button{min-block-size:38px;padding:0 16px;border:1px solid var(--border);border-radius:7px;font-size:12px;font-weight:400;color:var(--muted-foreground)}
+.shell-project-picker .ide-projects{min-block-size:100px;max-block-size:50dvh;overflow:auto}
+.shell-project-picker .dialog-body{gap:10px}
+.shell-project-picker .ide-sidebar-bottom{display:flex;flex-wrap:wrap}
+/* Project pages use the sidebar for projects and live sessions. */
+.ide-shell.project-shell[data-shell-page=project]>.ide-sidebar{padding:14px 10px 10px;min-inline-size:0;overflow:hidden}
+.project-sidebar-heading{display:flex;align-items:center;justify-content:space-between;padding:0 6px 10px 10px;flex:none}
+.project-sidebar-heading strong{font-size:13px;font-weight:600}
+.project-sidebar-heading button,.project-sidebar-footer button,.project-sidebar-search button,.project-sidebar-disclosure{display:flex;align-items:center;justify-content:center;min-inline-size:28px;min-block-size:28px;padding:5px;border:0;background:transparent;border-radius:6px;color:var(--muted-foreground)}
+.project-shell .ide-sidebar .project-sidebar-search{display:flex;flex-direction:row;align-items:center;gap:7px;margin:0 6px 14px;padding:0 8px;min-block-size:32px;flex:none;border:1px solid var(--border);border-radius:6px;color:var(--muted-foreground)}
+.project-sidebar-search input{inline-size:100%;min-inline-size:0;padding:5px 0;border:0;box-shadow:none;background:transparent;font-size:12px}
+.project-sidebar-search:focus-within{outline:2px solid var(--primary);outline-offset:2px}
+.project-sidebar-search input:focus-visible{outline:none}
+.project-sidebar-search>svg{flex:none}
+.project-shell .ide-sidebar .project-sidebar-list{margin-block-start:0;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.project-sidebar-row{display:flex;align-items:center;min-inline-size:0;gap:1px}
+.project-shell .project-sidebar-row .sidebar-project-name{flex:1;justify-content:flex-start;padding-inline:4px 8px;min-block-size:36px}
+.project-sidebar-row .project-sidebar-disclosure{min-inline-size:22px;padding:3px}
+.project-shell .current-project>.project-sidebar-row{background:var(--secondary);border-radius:6px}
+.project-shell .project-sidebar-workspaces .sidebar-workspace-name{justify-content:flex-start;min-block-size:30px;font-size:11px;padding-inline:8px}
+.sidebar-workspace-name span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.project-shell .sidebar-workspace-name[aria-current=true]{color:var(--foreground);font-weight:550}
+.project-sidebar-sessions .sidebar-content-heading{margin-block-start:6px;font-size:11px}
+.project-shell .project-sidebar-sessions .sidebar-content-item{justify-content:flex-start;min-block-size:34px}
+.project-sidebar-sessions .sidebar-content-item img{flex:none}
+.project-sidebar-footer{display:flex;align-items:center;justify-content:space-between;flex:none;gap:8px;padding:12px 4px 0;margin-block-start:auto}
+.project-sidebar-footer button{gap:8px;font-size:12px;min-block-size:32px}
+.project-sidebar-footer button:first-child{padding-inline:8px}
+.project-shell .project-sidebar-footer button:focus-visible,.project-shell .project-sidebar-heading button:focus-visible{outline:2px solid var(--primary);outline-offset:1px}
+@media(hover:hover) and (pointer:fine){.project-sidebar-heading button:hover,.project-sidebar-footer button:hover{background:var(--secondary);color:var(--foreground)}}
+/* Bound long session histories so other projects stay within reach. */
+.project-shell .project-sidebar-sessions .sidebar-content-list{max-block-size:min(340px,40dvh);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+/* Separate project creation and project actions, following the project-header reference. */
+.project-shell .project-sidebar-row .project-sidebar-action{display:flex;align-items:center;justify-content:center;flex:none;inline-size:24px;min-inline-size:24px;min-block-size:28px;padding:4px;border:0;background:transparent;border-radius:5px;color:var(--muted-foreground)}
+.project-action-menu [role=menuitem]{gap:8px;min-inline-size:0}
+.project-action-menu [role=menuitem]>svg{flex:none}
+.project-menu-arrow{margin-inline-start:auto}
+.project-action-menu .project-remove-action{color:light-dark(#b42318,#ffb4ab)}
+.project-action-menu .project-remove-action[data-highlighted]{color:light-dark(#b42318,#ffb4ab);background:light-dark(#fff1f0,#402925)}
+.project-group-heading{display:flex;align-items:center;gap:2px;margin-block:14px 5px;min-inline-size:0;color:var(--muted-foreground)}
+.project-shell .project-group-heading button{display:flex;align-items:center;justify-content:flex-start;gap:6px;min-block-size:28px;min-inline-size:24px;padding:4px;border:0;background:transparent;font-size:11px}
+.project-group-heading>button{flex:1;min-inline-size:0}
+.project-group-heading span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.project-group-heading small{margin-inline-start:auto;font-size:10px}
+.project-icon-options{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:20px}
+.project-icon-options button{display:flex;flex-direction:column;gap:10px;min-block-size:76px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--foreground);font-size:11px}
+.project-icon-options button[aria-pressed=true]{background:var(--secondary);border-color:var(--primary)}
+.workspace-navigation .current-project>.project-sidebar-row{background:transparent}
+.sidebar-project-workspaces{margin-block:4px 12px}
+.project-shell .sidebar-workspace-card{display:flex;align-items:flex-start;justify-content:flex-start;gap:8px;inline-size:100%;min-inline-size:0;min-block-size:56px;padding:8px 10px;border:1px solid transparent;border-radius:8px;background:transparent;color:var(--muted-foreground);text-align:start}
+.project-shell .sidebar-workspace-card.selected{border-color:var(--border);background:var(--secondary);color:var(--foreground)}
+.sidebar-workspace-summary{display:flex;flex-direction:column;gap:5px;flex:1;min-inline-size:0}
+.sidebar-workspace-title{display:flex;align-items:center;gap:6px;min-inline-size:0;line-height:18px}
+.sidebar-workspace-title strong{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-inline-size:0}
+.sidebar-workspace-card.unread strong{font-weight:700;color:var(--foreground)}
+.workspace-primary-badge{flex:none;padding:0 4px;font-size:10px;line-height:16px;border:1px solid var(--border);border-radius:4px;color:var(--muted-foreground)}
+.sidebar-workspace-detail{display:flex;align-items:center;gap:6px;min-inline-size:0;font-size:10px;line-height:15px}
+.sidebar-workspace-detail>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.workspace-host-badge{flex:none;max-inline-size:100%;padding-inline:5px;background:var(--secondary);border-radius:3px;font-size:9px}
+.selected .workspace-host-badge{background:var(--card)}
+.workspace-state-dot{display:inline-block;inline-size:8px;block-size:8px;flex:none;border-radius:50%;background:var(--muted-foreground)}
+.sidebar-workspace-card>.workspace-state-dot{margin-block-start:5px}
+.workspace-state-dot.in_progress{background:light-dark(#158466,#47c8a2)}
+.workspace-state-dot.in_review{background:light-dark(#b57513,#e4b354)}
+.workspace-state-dot.done{background:light-dark(#6552b9,#ad9bea)}
+.workspace-state-dot.sleeping{opacity:.45}
+.workspace-action-menu{inline-size:250px;max-block-size:min(650px,calc(100dvh - 24px));overflow-y:auto}
+.workspace-status-item{position:relative;padding-inline-start:24px!important}
+.workspace-status-item>[data-state]{position:absolute;inset-inline-start:6px;display:flex;align-items:center}
+@media(hover:hover) and (pointer:fine){.project-shell .app-titlebar button:hover:not(:disabled){background:var(--secondary)}.project-shell .app-titlebar .window-close:hover:not(:disabled){background:#c42b1c;color:white}}
+@media(max-width:700px){.project-shell .shell-menus button{min-inline-size:40px;padding-inline:4px}.ide-shell.project-shell>.app-titlebar{padding-inline-start:6px;gap:2px}.ide-shell.project-shell>.app-titlebar .window-controls button{inline-size:30px}.project-heading-row{padding-inline:12px}.project-heading-row>strong{max-inline-size:40%}.project-tools{overflow-x:auto}}

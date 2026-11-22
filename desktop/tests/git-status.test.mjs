@@ -1,0 +1,10 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import ts from 'typescript';
+const compiled=ts.transpileModule(readFileSync(new URL('../src/git-status.ts',import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText;
+const {parseGitStatus,decodeGitPath}=await import('data:text/javascript;base64,'+Buffer.from(compiled).toString('base64'));
+test('Git quoted UTF-8 paths display Chinese and preserve the service path',()=>{assert.equal(decodeGitPath('"\\347\\225\\214\\351\\235\\242.md"'),'界面.md')});
+test('spaces and literal arrows in untracked filenames are preserved',()=>{assert.equal(parseGitStatus('?? a -> b.txt\n')[0].path,'a -> b.txt');assert.equal(parseGitStatus(' M docs/my notes.md\n')[0].path,'docs/my notes.md')});
+test('rename target is selected without confusing quoted arrows',()=>{const row=parseGitStatus('R  "old -> name.txt" -> new.txt\n')[0];assert.equal(row.path,'new.txt');assert.equal(row.staged,true);assert.equal(row.kind,'renamed')});
+test('escaped quotes and backslashes survive decoding',()=>{assert.equal(decodeGitPath('"a\\"b\\\\c.txt"'),'a"b\\c.txt')});

@@ -1,0 +1,161 @@
+.ide-project-actions{display:flex;align-items:center;gap:2px;flex:none}
+/* Creation flows inherit the workbench's shared paper editor and green actions. */
+dialog.creation-dialog{
+  inline-size:min(620px,calc(100vw - 32px));max-block-size:calc(100dvh - 32px);overflow:clip;border-color:var(--border);border-radius:10px
+}
+.creation-dialog form{max-block-size:calc(100dvh - 34px)}
+.creation-dialog .dialog-heading{padding:20px 24px;align-items:flex-start}
+.creation-dialog .dialog-heading h2{font-size:19px;font-weight:600}
+.creation-heading-copy{display:grid;gap:7px}
+.creation-heading-copy p{color:var(--muted-foreground);font-size:12px;line-height:1.6}
+.creation-dialog .dialog-heading button{color:var(--muted-foreground)}
+.creation-dialog .dialog-body{padding:22px 24px;gap:16px;overscroll-behavior:contain}
+.creation-dialog .creation-fields{display:grid;gap:24px;margin:0;padding:0;border:0;min-inline-size:0}
+.creation-context{display:flex;flex-wrap:wrap;gap:16px;padding-block-end:22px;border-block-end:1px solid var(--border)}
+.creation-context>.creation-field{flex:1 1 240px}
+.creation-dialog .creation-field{display:grid;gap:8px}
+.creation-dialog .creation-label,.creation-dialog .creation-label-row{font-size:13px;color:var(--foreground);font-weight:500}
+.creation-dialog .creation-field>.creation-label{display:flex;align-items:center;min-block-size:24px}
+.creation-dialog .creation-label small,.creation-label-row small{font-size:11px;margin-inline-start:4px}
+.creation-dialog .creation-label-row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-block-size:22px}
+.creation-dialog .creation-label-row>button{min-block-size:24px;padding:2px 4px;color:var(--primary);font-size:12px}
+.creation-dialog .creation-control,.creation-dialog .creation-location,.creation-dialog .creation-search{display:flex;flex-direction:row;align-items:center;gap:9px;border:1px solid var(--input);background:var(--card);border-radius:5px;min-block-size:40px;padding:0 11px}
+.creation-dialog .creation-location{background:var(--secondary)}
+.creation-control>svg,.creation-location>svg,.creation-search>svg{color:var(--muted-foreground)}
+.creation-dialog .creation-control select{appearance:none;flex:1;border:0;background:transparent;padding:10px 0;border-radius:0;font-size:14px;cursor:pointer}
+.creation-dialog .creation-control:focus-within,.creation-dialog .creation-search:focus-within{outline:2px solid var(--ring);outline-offset:2px}
+.creation-dialog .creation-location strong{font-size:13px;font-weight:500;white-space:nowrap}
+.creation-dialog .creation-location>span{margin-inline-start:auto;overflow-wrap:anywhere;font-family:var(--font-mono);font-size:11px;color:var(--muted-foreground);text-align:end;padding-block:8px}
+.creation-dialog .creation-base{display:flex;flex-direction:row;gap:4px;align-items:center;max-inline-size:62%;border:1px solid var(--border);border-radius:6px;padding-inline:5px}
+.creation-dialog .creation-base select{inline-size:auto;max-inline-size:100%;padding:3px 0;background:transparent;border:0;font-size:11px}
+.creation-dialog .creation-source-tabs{display:flex;flex-wrap:wrap;gap:4px;margin-block:12px}
+.creation-dialog .creation-source-tabs button{flex:none;border-radius:4px;padding:7px 8px;gap:5px;min-block-size:32px;border:1px solid transparent;font-size:12px;color:var(--muted-foreground)}
+.creation-dialog .creation-source-tabs button[aria-selected=true]{border-color:var(--border);background:var(--secondary);color:var(--primary);font-weight:600}
+.creation-dialog .creation-search input{padding:10px 0;border:0;background:transparent;min-inline-size:0;font-size:14px}
+.creation-dialog .creation-results{margin-block-start:7px;border:1px solid var(--border);border-radius:7px;padding:3px;max-block-size:180px;overflow:auto;overscroll-behavior:contain}
+.creation-dialog .creation-results button{inline-size:100%;justify-content:flex-start;text-align:start;padding:8px;gap:9px;white-space:normal}
+.creation-dialog .creation-results button>span{flex:1;overflow-wrap:anywhere}
+.creation-results strong,.creation-selected strong{display:block;font-size:12px;font-weight:500}
+.creation-results small,.creation-selected small{display:block;color:var(--muted-foreground);font-size:11px;margin-block-start:4px}
+.creation-dialog .creation-selected{display:flex;align-items:center;gap:10px;border:1px solid var(--input);background:var(--secondary);border-radius:7px;padding:11px;margin-block-start:8px}
+.creation-selected>div{flex:1;overflow-wrap:anywhere}
+.creation-selected>svg{color:var(--muted-foreground)}
+.creation-dialog .creation-selected button{padding:4px;min-block-size:26px}
+.creation-dialog .creation-advanced{border:0;border-block-start:1px solid var(--border);padding-block-start:16px}
+.creation-dialog .creation-advanced>summary{padding-block:0;min-block-size:28px;justify-content:flex-start;gap:6px;list-style:none;font-size:13px;color:var(--foreground)}
+.creation-advanced>summary::-webkit-details-marker{display:none}
+.creation-advanced[open]>summary>svg{rotate:180deg}
+.creation-advanced>summary small{color:var(--amber);margin-inline-start:auto}
+.creation-dialog .composer-advanced{padding-block:16px 0;gap:14px}
+.creation-dialog .composer-advanced p,.creation-dialog .composer-advanced small{color:var(--muted-foreground);font-size:11px;line-height:1.7}
+.creation-dialog .creation-hint{font-size:11px;line-height:1.7;color:var(--muted-foreground);margin-block-start:8px;overflow-wrap:anywhere}
+.creation-dialog .creation-hint button{padding:0 5px;min-block-size:24px;font-size:11px;text-decoration:underline}
+.creation-dialog .creation-error{padding:10px;border-radius:6px;background:color-mix(in oklch,var(--danger) 8%,var(--popover));color:var(--danger);font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere}
+.creation-dialog .creation-notice{color:var(--status-success);font-size:12px}
+.creation-dialog .dialog-footer{align-items:center;justify-content:space-between;gap:12px;padding:16px 24px;flex-wrap:wrap;background:var(--card)}
+.creation-dialog .dialog-footer>.primary{margin-inline-start:auto;min-block-size:38px;padding-inline:16px;font-size:13px;font-weight:600}
+.creation-dialog kbd{font-family:inherit;font-size:10px;opacity:.65;margin-inline-start:6px}
+.creation-dialog .creation-more{display:flex;flex-direction:row;align-items:center;gap:8px;color:var(--muted-foreground);cursor:pointer;font-size:12px}
+.creation-dialog .creation-more input{appearance:none;inline-size:30px;block-size:18px;flex:none;margin:0;padding:2px;border:0;border-radius:20px;background:var(--input);cursor:pointer}
+.creation-more input::before{content:'';display:block;inline-size:14px;block-size:14px;border-radius:50%;background:var(--muted-foreground)}
+.creation-more input:checked{background:var(--primary)}
+.creation-more input:checked::before{background:var(--primary-foreground);translate:12px 0}
+.creation-more input:disabled{opacity:.45;cursor:not-allowed}
+.creation-more input:active:not(:disabled){box-shadow:0 0 0 3px var(--secondary)}
+.creation-dialog .creation-path{font-family:var(--font-mono);font-size:11px;overflow-wrap:anywhere;color:var(--muted-foreground)}
+.creation-dialog .creation-location-input input{flex:1;min-inline-size:0;background:transparent;border:0;padding:9px 0}
+.creation-dialog .creation-location-input button{padding:4px;min-block-size:28px}
+@media(hover:hover) and (pointer:fine){
+  .creation-dialog button:hover:not(:disabled){background:var(--accent)}
+  .creation-dialog .creation-source-tabs button:hover:not(:disabled){color:var(--foreground)}
+  .creation-dialog .creation-more:hover{color:var(--foreground)}
+}
+
+/* Approved shared editor appearance, scoped for the installed baseline. */
+.ide-shell dialog.creation-dialog {
+  --background:oklch(.99 0 none); --foreground:oklch(.25 0 none);
+  --card:oklch(1 0 none); --popover:var(--card); --secondary:oklch(.95 .005 157);
+  --muted:var(--secondary); --muted-foreground:oklch(.48 0 none);
+  --border:oklch(.85 0 none); --input:var(--border); --accent:var(--secondary);
+  --primary:oklch(.3 .04 170); --primary-foreground:oklch(.99 0 none); --ring:var(--primary);
+  --danger:oklch(.48 .17 25); --status-success:oklch(.43 .09 157);
+  --wb-bg:var(--background); --wb-text:var(--foreground); --wb-panel:var(--card); --wb-line:var(--border); --wb-muted:var(--muted-foreground); --wb-accent:var(--primary);
+  --bg:var(--background); --text:var(--foreground); --line:var(--border); --panel:var(--card);
+  color-scheme:light; color:var(--foreground); background:var(--background);
+  border:1px solid var(--border); border-radius:10px; font-family:var(--font-sans);
+}
+.ide-shell dialog.creation-dialog::backdrop { background:oklch(.1 0 none / .65); }
+.ide-shell dialog.creation-dialog .dialog-heading { padding:20px 24px; border-block-end:1px solid var(--border); gap:16px; }
+.ide-shell dialog.creation-dialog .dialog-heading h2 { font-size:19px; font-weight:600; line-height:1.4; overflow-wrap:anywhere; }
+.ide-shell dialog.creation-dialog .dialog-body { padding:22px 24px; }
+.ide-shell dialog.creation-dialog .dialog-footer { padding:16px 24px; border-block-start:1px solid var(--border); gap:10px; flex-wrap:wrap; }
+.ide-shell dialog.creation-dialog button { border-radius:5px; }
+
+.add-project-host{display:flex;align-items:center;gap:12px;font-size:12px;color:var(--muted-foreground)}
+.add-project-host>span:last-child{display:flex;align-items:center;gap:7px;border:1px solid var(--border);border-radius:5px;padding:6px 10px;color:var(--foreground);background:var(--secondary)}
+.add-project-options{display:grid;gap:10px}
+.ide-shell .add-project-dialog .add-project-options button{display:flex;justify-content:flex-start;gap:14px;inline-size:100%;padding:16px;text-align:start;border:1px solid var(--border);white-space:normal;min-block-size:76px}
+.add-project-options button>span{display:grid;flex:1;gap:5px}
+.add-project-options button strong{font-size:14px;font-weight:600}
+.add-project-options button small{font-size:12px;line-height:1.6;color:var(--muted-foreground)}
+.add-project-options button>svg{color:var(--primary)}
+.ide-shell .add-project-dialog .add-project-browse{background:var(--secondary);border-color:color-mix(in oklch,var(--primary) 35%,var(--border))}
+.add-project-caption{font-size:12px;color:var(--muted-foreground);margin-block-start:10px}
+.add-project-alternatives{border:1px solid var(--border);border-radius:7px;overflow:clip}
+.ide-shell .add-project-dialog .add-project-alternatives button{border:0;border-radius:0}
+.ide-shell .add-project-dialog .add-project-alternatives button+button{border-block-start:1px solid var(--border)}
+.add-project-dialog label>small{font-weight:400}
+
+/* Refine only the homepage's Add Project dialog; keep all existing flow states. */
+.ide-shell dialog.add-project-dialog {
+  inline-size: min(480px, calc(100vw - 32px));
+  max-block-size: calc(100dvh - 40px);
+  --border: oklch(90% 0 none);
+  --background: oklch(100% 0 none);
+  --muted-foreground: oklch(46% 0 none);
+  --secondary: oklch(97% .003 170);
+  --accent: var(--secondary);
+  background: var(--background);
+  border: 0;
+  border-radius: 16px;
+  box-shadow: 0 20px 64px oklch(20% 0 none / .18);
+}
+.ide-shell dialog.add-project-dialog::backdrop { background: oklch(15% 0 none / .3); }
+.ide-shell dialog.add-project-dialog > form { max-block-size: calc(100dvh - 40px); }
+.ide-shell dialog.add-project-dialog .dialog-heading { padding: 24px 24px 18px; gap: 16px; border: 0; }
+.ide-shell dialog.add-project-dialog .dialog-heading h2 { font-size: 20px; line-height: 1.4; font-weight: 600; letter-spacing: -.025em; }
+.ide-shell dialog.add-project-dialog .creation-heading-copy { gap: 6px; }
+.ide-shell dialog.add-project-dialog .creation-heading-copy p { font-size: 12px; line-height: 1.7; }
+.ide-shell dialog.add-project-dialog .dialog-heading > button { min-inline-size: 30px; min-block-size: 30px; padding: 6px; margin-block-start: -3px; margin-inline-end: -5px; border: 0; background: transparent; border-radius: 7px; }
+.ide-shell dialog.add-project-dialog .dialog-body { padding: 0 24px 24px; gap: 18px; }
+.ide-shell dialog.add-project-dialog .add-project-host { gap: 10px; font-size: 11px; }
+.ide-shell dialog.add-project-dialog .add-project-host > span:last-child { padding: 0; border: 0; background: transparent; color: var(--muted-foreground); font-size: 12px; }
+.ide-shell dialog.add-project-dialog .add-project-options { gap: 8px; }
+.ide-shell dialog.add-project-dialog .add-project-options button { gap: 12px; padding: 13px 14px; min-block-size: 68px; border-radius: 9px; }
+.ide-shell dialog.add-project-dialog .add-project-options button > span { gap: 4px; }
+.ide-shell dialog.add-project-dialog .add-project-options button strong { font-size: 13px; font-weight: 550; }
+.ide-shell dialog.add-project-dialog .add-project-options button small { font-size: 11px; line-height: 1.6; }
+.ide-shell dialog.add-project-dialog .add-project-options button > svg:first-child { stroke-width: 1.7; }
+.ide-shell dialog.add-project-dialog .add-project-options button > svg:last-child { color: var(--muted-foreground); inline-size: 14px; }
+.ide-shell dialog.add-project-dialog .add-project-browse { background: var(--secondary); border: 1px solid oklch(89% .012 170); min-block-size: 78px; }
+.ide-shell dialog.add-project-dialog .add-project-browse strong { font-size: 14px; }
+.ide-shell dialog.add-project-dialog .add-project-caption { margin-block: 15px 1px; padding-inline: 2px; font-size: 11px; }
+.ide-shell dialog.add-project-dialog .add-project-alternatives { border: 0; border-radius: 0; overflow: visible; }
+.ide-shell dialog.add-project-dialog .add-project-alternatives button { min-block-size: 62px; padding-inline: 12px; border: 0; background: transparent; }
+.ide-shell dialog.add-project-dialog .add-project-alternatives button > svg:first-child { color: var(--muted-foreground); }
+.ide-shell dialog.add-project-dialog .add-project-alternatives button + button { border-block-start: 0; margin-block-start: 4px; }
+.ide-shell dialog.add-project-dialog .creation-fields { gap: 18px; }
+.ide-shell dialog.add-project-dialog .creation-fields input { min-block-size: 38px; border-radius: 7px; }
+.ide-shell dialog.add-project-dialog .dialog-footer { padding: 14px 24px; background: var(--background); border-block-start: 1px solid var(--border); }
+.ide-shell dialog.add-project-dialog button:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
+.ide-shell dialog.add-project-dialog button:active:not(:disabled) { background: color-mix(in oklch, var(--primary) 9%, var(--background)); }
+@media (hover: hover) and (pointer: fine) {
+  .ide-shell dialog.add-project-dialog .dialog-heading > button:hover:not(:disabled),
+  .ide-shell dialog.add-project-dialog .add-project-alternatives button:hover:not(:disabled) { background: var(--secondary); }
+  .ide-shell dialog.add-project-dialog .add-project-browse:hover:not(:disabled) { background: color-mix(in oklch, var(--primary) 6%, var(--background)); }
+}
+@media (width < 520px) {
+  .ide-shell dialog.add-project-dialog .dialog-heading { padding-inline: 20px; }
+  .ide-shell dialog.add-project-dialog .dialog-body { padding-inline: 20px; }
+  .ide-shell dialog.add-project-dialog .dialog-footer { padding-inline: 20px; }
+}

@@ -1,0 +1,40 @@
+Linux performance baseline
+
+Build the current checkout (including uncommitted changes):
+  cargo build --release --bin velella-runtime
+  cd desktop && npm run build
+
+From the repository root, in a dedicated Orca shell terminal:
+  python3 scripts/benchmark-desktop.py --output /absolute/new/output-directory
+  python3 scripts/report-performance.py /absolute/new/output-directory
+
+Capture stdout/stderr with tee and pipefail; copy that log to OUTPUT/run.log.
+The output directory must not exist. --quick runs a reduced harness check,
+not a baseline. The standard run includes 10 fresh-profile launches, 60s warmup,
+120s empty idle, 30 latency samples, 3 repetitions of 1/4/8-session workloads,
+30 restricted-execution samples, 120s loaded idle, 600s sustained output,
+120s recovery and 30 final latency samples. Builds are excluded from timers.
+
+Each sustained producer emits 65536 bytes once per second. Four producers run
+concurrently. A fifth session probes short-command latency every 10 seconds;
+all 8 sessions remain open for loaded-idle and recovery measurements.
+Raw PTY data is verified incrementally with byte count and SHA-256, not retained.
+Desktop readiness observes the actual main entry, DOM and IPC; there is no
+product-code instrumentation. The terminal measurements directly use daemon
+IPC, not renderer painting. These tests do not establish visible terminal FPS.
+
+The runner uses a private /tmp data directory and kills only observed test-owned
+PIDs whose Linux start time still matches. It removes temporary data after
+cleanup and retains result.json, resources.csv and Electron/restricted logs.
+No authentication or model requests are used. A failure is recorded as failed;
+later phases that cannot run are explicitly missing in the report.
+
+View locally through an Orca terminal running:
+  python3 -m http.server 8768 --bind 127.0.0.1 --directory /absolute/output-directory
+Then create an Orca browser tab at http://127.0.0.1:8768/report.html.
+Choose another free local port if occupied. Do not publish this report publicly.
+
+Report generation checks its summaries against the raw CSV and latency samples.
+P95 is nearest-rank and descriptive, not an SLA verdict. RSS sums shared pages;
+compare loaded_idle and recovery, not zero-terminal idle, for retained memory.
+Orca is sampled separately as the controller, not as a competing benchmark.

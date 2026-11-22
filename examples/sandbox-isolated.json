@@ -1,0 +1,6 @@
+{
+  "mode": "isolated",
+  "read_only": [],
+  "writable": [],
+  "network": "denied"
+}

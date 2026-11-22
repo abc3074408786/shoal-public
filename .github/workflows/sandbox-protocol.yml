@@ -1,0 +1,40 @@
+name: Sandbox RPC acceptance without model login
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  protocol:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    env:
+      CARGO_PROFILE_DEV_DEBUG: '0'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install runtime test dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y bubblewrap python3 libdbus-1-dev pkg-config
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: sandbox-protocol-${{ runner.os }}-${{ hashFiles('Cargo.lock') }}
+      - name: Check the acceptance harness
+        run: python3 scripts/test-real-sandbox-agent.py
+      - name: Build actual runtime
+        run: cargo build --locked -p velella --bin velella-runtime
+      - name: Run fixed Agent through real isolated RPC task
+        run: |
+          python3 scripts/verify-real-sandbox-agent.py \
+            --runtime target/debug/velella-runtime \
+            --output artifacts/sandbox-rpc-fixture \
+            --fixture-agent --timeout 90
+      - name: Preserve receipt only
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sandbox-rpc-fixture
+          path: artifacts/sandbox-rpc-fixture/result.json

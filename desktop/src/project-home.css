@@ -1,0 +1,219 @@
+/* Owner-pinned macOS glass material. All shell overrides expire when Home leaves. */
+.ide-shell.project-shell:has(.project-home) {
+  color-scheme: only light;
+  --foreground: oklch(26% 0 none);
+  --muted-foreground: oklch(44% 0 none);
+  --primary: light-dark(oklch(46% .18 255), oklch(78% .12 250));
+  --ring: light-dark(oklch(55% .19 255), oklch(78% .12 250));
+  --border: light-dark(oklch(100% 0 none / .48), oklch(100% 0 none / .14));
+  --secondary: light-dark(oklch(100% 0 none / .56), oklch(100% 0 none / .1));
+  --accent: light-dark(oklch(100% 0 none / .58), oklch(100% 0 none / .12));
+  --home-glass: oklch(100% 0 none / .78);
+  --home-glass-edge: oklch(100% 0 none / .94);
+  --home-glass-shadow: oklch(20% 0 none / .1);
+  --home-hairline: oklch(25% 0 none / .09);
+  color: var(--foreground);
+  background: oklch(98.7% 0 none);
+}
+.ide-shell.project-shell:has(.project-home) > .app-titlebar {
+  background: oklch(100% 0 none / .7);
+  border-block-end: 1px solid var(--home-hairline);
+  backdrop-filter: blur(24px) saturate(1.25);
+}
+.ide-shell.project-shell:has(.project-home) > .ide-sidebar {
+  background: oklch(100% 0 none / .56);
+  border-inline-end: 1px solid var(--home-hairline);
+  backdrop-filter: blur(24px) saturate(1.25);
+}
+.ide-shell.project-shell:has(.project-home) .ide-nav.selected {
+  background: var(--secondary);
+  box-shadow: 0 1px 3px light-dark(oklch(30% .03 250 / .06), oklch(0% 0 none / .12));
+}
+.project-shell:has(.project-home) .ide-main,
+.project-shell:has(.project-home) .wb-body { background: transparent; }
+.project-home {
+  flex: 1;
+  min-block-size: 0;
+  overflow: auto;
+  background: transparent;
+  container-type: inline-size;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', sans-serif;
+}
+.project-home-inner {
+  inline-size: min(940px, calc(100% - 80px));
+  margin-inline: auto;
+  margin-block: clamp(40px, 8vh, 84px);
+  padding: 0;
+  overflow: clip;
+  border: 1px solid var(--home-glass-edge);
+  border-radius: 24px;
+  background: var(--home-glass);
+  backdrop-filter: blur(32px) saturate(1.35);
+  box-shadow: 0 24px 64px var(--home-glass-shadow), inset 0 1px 0 var(--home-glass-edge);
+}
+.project-home-header {
+  margin: 0;
+  padding-block: 34px 30px;
+  padding-inline: 34px;
+  border-block-end: 1px solid var(--home-hairline);
+}
+.project-home-brand { display: flex; align-items: center; gap: 16px; }
+.project-home-brand img { flex: none; object-fit: contain; }
+.project-home-brand h1 { margin: 0 0 6px; font-size: 25px; line-height: 1.4; font-weight: 600; }
+.project-home-brand p { margin: 0; color: var(--muted-foreground); font-size: 13px; line-height: 1.7; }
+.project-home-content { display: grid; grid-template-columns: 252px minmax(0, 1fr); gap: 0; }
+.project-home-start, .project-home-projects { min-inline-size: 0; }
+.project-home-start {
+  padding: 26px 24px 32px;
+  border-inline-end: 1px solid var(--home-hairline);
+  background: light-dark(oklch(100% 0 none / .14), oklch(0% 0 none / .06));
+}
+.project-home-projects { padding: 26px 30px 34px; min-block-size: 334px; }
+.project-home-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 16px;
+  font-size: 12px;
+  line-height: 1.5;
+  font-weight: 600;
+  color: var(--muted-foreground);
+}
+.project-home-section-title span { font-size: 11px; font-weight: 400; font-variant-numeric: tabular-nums; }
+.project-home-actions { display: grid; gap: 10px; }
+.project-shell .project-home-actions button {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 10px;
+  inline-size: 100%;
+  min-block-size: 70px;
+  padding: 12px;
+  border: 1px solid var(--home-glass-edge);
+  border-radius: 12px;
+  background: light-dark(oklch(100% 0 none / .26), oklch(100% 0 none / .05));
+  box-shadow: 0 2px 5px light-dark(oklch(30% .04 250 / .035), oklch(0% 0 none / .08));
+  text-align: start;
+}
+.project-home-actions button > svg { flex: none; margin-block-start: 2px; color: var(--primary); }
+.project-home-actions button > span { display: grid; gap: 5px; min-inline-size: 0; }
+.project-home-actions strong { color: var(--foreground); font-size: 13px; line-height: 1.4; font-weight: 550; }
+.project-home-actions small { color: var(--muted-foreground); font-size: 11px; line-height: 1.5; }
+.project-shell .project-home-search {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  inline-size: 100%;
+  min-block-size: 36px;
+  padding-inline: 10px;
+  border: 1px solid var(--home-hairline);
+  border-radius: 9px;
+  background: light-dark(oklch(100% 0 none / .38), oklch(0% 0 none / .12));
+  box-shadow: inset 0 1px 2px light-dark(oklch(30% .03 250 / .04), oklch(0% 0 none / .12));
+  color: var(--muted-foreground);
+}
+.project-home-search svg { flex: none; }
+.project-home-search:focus-within { outline: 2px solid var(--ring); outline-offset: 1px; }
+.project-shell .project-home-search input {
+  inline-size: 100%;
+  min-inline-size: 0;
+  min-block-size: 34px;
+  padding: 6px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--foreground);
+  font-size: 12px;
+}
+.project-home-search input::placeholder { color: var(--muted-foreground); }
+.project-shell .project-home-search input:focus-visible { outline: 2px solid transparent; }
+.project-home-grid {
+  display: grid;
+  align-content: start;
+  list-style: none;
+  padding: 0;
+  padding-inline-end: 6px;
+  margin: 10px -10px 0;
+  max-block-size: clamp(198px, calc(100dvh - 430px), 396px);
+  overflow-y: scroll;
+  overflow-x: clip;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  scrollbar-width: auto;
+  scrollbar-color: auto;
+}
+.project-home-grid::-webkit-scrollbar { width: 8px; background: transparent; }
+.project-home-grid::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
+.project-home-grid::-webkit-scrollbar-track { background: oklch(91% 0 none); border-inline: 3px solid transparent; background-clip: padding-box; border-radius: 8px; }
+.project-home-grid::-webkit-scrollbar-thumb { background: oklch(65% 0 none / .6); border: 1px solid transparent; background-clip: padding-box; border-radius: 8px; min-height: 28px; }
+.project-home-grid::-webkit-scrollbar-corner { background: transparent; }
+@media (hover: hover) and (pointer: fine) {
+  .project-home-grid::-webkit-scrollbar-thumb:hover { background-color: oklch(52% 0 none / .8); }
+}
+.project-home-grid:empty { display: none; }
+.project-home-grid > li { min-inline-size: 0; }
+.project-shell .project-home-card {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) 16px;
+  align-items: center;
+  gap: 12px;
+  inline-size: 100%;
+  min-inline-size: 0;
+  min-block-size: 66px;
+  padding: 11px 10px;
+  margin: 0;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--foreground);
+  text-align: start;
+}
+.project-home-folder { display: flex; align-self: start; padding-block-start: 3px; color: var(--primary); }
+.project-home-folder svg { stroke-width: 1.7; fill: color-mix(in oklch, var(--primary) 12%, transparent); }
+.project-home-info { display: grid; gap: 4px; min-inline-size: 0; }
+.project-home-info strong { font-size: 14px; line-height: 1.5; font-weight: 550; }
+.project-home-info code { font-family: inherit; font-size: 12px; line-height: 1.5; color: var(--muted-foreground); }
+.project-home-info strong, .project-home-info code { overflow: clip; white-space: nowrap; text-overflow: ellipsis; }
+.project-home-open { color: var(--muted-foreground); opacity: 0; }
+.project-home-card:focus-visible .project-home-open { opacity: 1; }
+.project-shell .project-home-card:active:not(:disabled),
+.project-shell .project-home-actions button:active:not(:disabled) { background: color-mix(in oklch, var(--primary) 13%, var(--secondary)); }
+.project-home-empty { display: grid; justify-items: start; gap: 8px; padding-block: 28px; color: var(--muted-foreground); }
+.project-home-empty > svg { display: none; }
+.project-home-empty h3 { margin: 0; color: var(--foreground); font-size: 14px; font-weight: 550; }
+.project-home-empty p { margin: 0; font-size: 12px; line-height: 1.8; }
+.project-home-empty button { padding: 4px 10px; margin-block-start: 4px; border: 1px solid var(--home-hairline); border-radius: 7px; background: var(--secondary); font-size: 12px; }
+@media (hover: hover) and (pointer: fine) {
+  .project-shell .project-home-card:hover:not(:disabled),
+  .project-shell .project-home-actions button:hover:not(:disabled) { background: var(--accent); }
+  .project-home-card:hover:not(:disabled) .project-home-open { opacity: 1; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .project-shell .project-home-card, .project-shell .project-home-actions button { transition: background-color 160ms ease-out; }
+}
+@container (width < 720px) {
+  .project-home-inner { inline-size: calc(100% - 32px); margin-block: 24px; border-radius: 20px; }
+  .project-home-header { padding: 26px 24px; }
+  .project-home-brand { gap: 12px; }
+  .project-home-brand h1 { font-size: 22px; }
+  .project-home-brand p { font-size: 12px; }
+  .project-home-content { grid-template-columns: minmax(0, 1fr); }
+  .project-home-start { padding: 22px 24px; border-inline-end: 0; border-block-end: 1px solid var(--home-hairline); }
+  .project-home-projects { padding: 22px 24px 28px; min-block-size: 300px; }
+  .project-home-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .project-shell .project-home-actions button { padding: 10px; gap: 8px; }
+}
+@supports not (backdrop-filter: blur(1px)) {
+  .project-home-inner { background: oklch(100% 0 none); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .project-home-inner { background: oklch(100% 0 none); backdrop-filter: none; }
+  .ide-shell.project-shell:has(.project-home) > .ide-sidebar,
+  .ide-shell.project-shell:has(.project-home) > .app-titlebar { background: oklch(99% 0 none); backdrop-filter: none; }
+}
+@media (forced-colors: active) {
+  .project-home-inner { background: Canvas; border-color: CanvasText; box-shadow: none; backdrop-filter: none; }
+  .project-home { color: CanvasText; }
+  .project-shell .project-home-card, .project-shell .project-home-actions button { border: 1px solid ButtonText; color: ButtonText; }
+}

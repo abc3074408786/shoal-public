@@ -1,0 +1,21 @@
+# Import as a desktop runtime task. Requires a functioning Linux bwrap backend.
+name: isolated-task
+agent: codex
+base: main
+instruction: Inspect the project and implement the requested change. Leave it for review.
+policy:
+  permissions: ask
+  execution:
+    mode: isolated
+    # Explicitly grants host networking for API access, including localhost.
+    network: host
+    # Add canonical installation directories for non-system Agent/tools here.
+    read_only: []
+    writable: []
+  budget:
+    wall_clock: 2h
+done:
+  - run: git diff --check
+verify:
+  retries: 1
+on_done: review

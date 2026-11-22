@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>工作台 Codex 终端入口 · 浏览器验收夹具</title>
+    <style>
+      html, body { margin: 0; height: 100%; }
+      #root { height: calc(100dvh - 146px); }
+      #root .ide-shell { block-size: 100%; height: 100%; }
+      #qa-panel { position: fixed; inset: auto 0 0; height: 146px; box-sizing: border-box; overflow: auto; background: #181b22; color: #f4f5f8; border-top: 1px solid #606778; padding: 8px 12px; font: 12px/1.5 system-ui, sans-serif; }
+      #qa-panel p, #qa-panel pre { margin: 3px 0; }
+      #qa-panel a { color: #a8d5ff; margin-right: 12px; }
+      #qa-summary { white-space: pre-wrap; overflow-wrap: anywhere; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <aside id="qa-panel" aria-label="浏览器验收摘要">
+      <strong>仅浏览器验收夹具：RPC 和存储均在内存模拟；不创建文件或进程，不登录，不调用模型。</strong>
+      <p id="qa-scenarios">
+        <a href="?scenario=ready">Git 可用</a>
+        <a href="?scenario=direct">普通文件夹</a>
+        <a href="?scenario=unavailable">限制能力不可用</a>
+        <a href="?scenario=reprobe-failure">重新检查失败</a>
+        <a href="?scenario=launch-failure">创建后启动失败与重试</a>
+        <a href="?scenario=existing-worktree">已有工作树直接新建</a>
+        <a href="?scenario=existing-launch-failure">已有工作树启动失败重试</a>
+        <a href="?scenario=existing-launch-recorded-failure">启动失败但会话记录已保存</a>
+        <a href="?scenario=layout-failure">终端成功但布局首次失败</a>
+        <a href="?scenario=layout-persisted-failure">布局已保存但响应失败</a>
+        <a href="?scenario=primary-folder">Git 主目录</a>
+        <a href="?scenario=existing-folder">已有普通文件夹</a>
+        <a href="?scenario=task-owned">已停止任务保留工作树</a>
+        <a href="?scenario=task-active">进行中任务禁止额外终端</a>
+        <a href="?scenario=existing-unavailable">已有工作树能力不可用</a>
+      </p>
+      <p>新增场景：从顶部“新建标签”选择“新建 Codex 终端”。失败后使用对话框的重试按钮；受限不可用时，需显式选择“本机执行”。查看下方 JSON 的 createCalls、openCalls、request_id、layoutFailures 与 assertions。</p>
+      <p id="qa-status">正在加载夹具…</p>
+      <details><summary>全部 RPC 请求与断言</summary><pre id="qa-summary"></pre></details>
+    </aside>
+    <script type="module" src="/tests/workbench-terminal-ui.fixture.tsx"></script>
+  </body>
+</html>

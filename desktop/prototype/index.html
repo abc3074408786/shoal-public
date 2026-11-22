@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Velella · 界面原型</title>
+  <link rel="icon" type="image/png" href="/velella.png">
+  <link rel="stylesheet" href="./gallery.css">
+</head>
+<body>
+  <main>
+    <header>
+      <img src="../src/assets/velella-logo-v2.png" alt="" width="56" height="56">
+      <div>
+        <h1>Velella 界面原型</h1>
+        <p>浏览当前桌面界面，用示例项目试走工作流。终端、账号和主机均为模拟。</p>
+      </div>
+    </header>
+    <nav aria-label="原型入口">
+      <section aria-labelledby="workspace">
+        <h2 id="workspace">桌面工作台</h2>
+        <div class="links">
+          <a class="primary" href="./app.html" target="_blank" rel="noopener"><strong>进入工作台</strong><span>从首页打开项目、设置、自动化、任务来源和插件</span></a>
+          <a href="./app.html?view=project" target="_blank" rel="noopener"><strong>打开示例项目</strong><span>工作区、终端、Agent 输入、代码、Markdown、Git 和浏览器</span></a>
+          <a href="./app.html?view=project&theme=dark" target="_blank" rel="noopener"><strong>查看深色主题</strong><span>同一工作台的深色外观</span></a>
+          <a href="./hud.html" target="_blank" rel="noopener"><strong>任务监视窗</strong><span>示例任务状态与返回工作台</span></a>
+          <a href="./app.html?empty" target="_blank" rel="noopener"><strong>空白首页</strong><span>项目清单为空时的起步界面</span></a>
+          <a href="./app.html?disconnected" target="_blank" rel="noopener"><strong>后台断开</strong><span>连接失败提示与重连入口</span></a>
+        </div>
+      </section>
+      <section aria-labelledby="flows">
+        <h2 id="flows">工作流场景</h2>
+        <div class="links">
+          <a href="../tests/orchestration-v2.html" target="_blank" rel="noopener"><strong>Agent 编排</strong><span>从工作台侧栏进入，演示创建协作、角色和计划</span></a>
+          <a href="../tests/automation-interface.html?demo&task&theme=light" target="_blank" rel="noopener"><strong>自动化运行记录</strong><span>从工作台侧栏进入，查看排队、待审查和失败的记录</span></a>
+          <a href="../tests/console-pages.html?theme=light" target="_blank" rel="noopener"><strong>任务来源详情</strong><span>从工作台侧栏进入，选择示例任务查看描述和讨论</span></a>
+          <a href="../tests/settings-extension.html" target="_blank" rel="noopener"><strong>完整设置页</strong><span>Agent、权限、账号、终端、工作区和主题</span></a>
+          <a href="../tests/plugins.html" target="_blank" rel="noopener"><strong>插件和 MCP</strong><span>从工作台侧栏进入插件，另可查看 MCP 选择器</span></a>
+          <a href="../tests/computer-use-plugin.html" target="_blank" rel="noopener"><strong>Computer Use 插件</strong><span>插件详情与模拟工具目录</span></a>
+          <a href="./app.html?view=plugins" target="_blank" rel="noopener"><strong>技能中心与开发本体</strong><span>在插件页打开技能清单和示例本体</span></a>
+          <a href="../tests/permission-host-qa.html" target="_blank" rel="noopener"><strong>执行权限和主机</strong><span>主机与 Agent 的权限界面</span></a>
+          <a href="../tests/workspace-options.html" target="_blank" rel="noopener"><strong>工作区选项</strong><span>状态、收藏、层级与归档入口</span></a>
+          <a href="../tests/workbench-terminal-ui.html?scenario=ready" target="_blank" rel="noopener"><strong>新工作区与终端启动</strong><span>检查 CLI、填写配置和打开模拟会话</span></a>
+        </div>
+      </section>
+      <section aria-labelledby="states">
+        <h2 id="states">界面状态</h2>
+        <div class="links">
+          <a href="../tests/workbench-interface.html?theme=light&task" target="_blank" rel="noopener"><strong>工作台与待授权任务</strong><span>多标签、工具区及等待授权提示</span></a>
+          <a href="../tests/project-shell.html?layout=columns" target="_blank" rel="noopener"><strong>项目与多列布局</strong><span>项目切换和终端布局演示</span></a>
+          <a href="../tests/retired-session.html" target="_blank" rel="noopener"><strong>已退出的历史会话</strong><span>保留会话记录、再次打开终端</span></a>
+          <a href="../tests/workbench-terminal-ui.html?scenario=launch-failure" target="_blank" rel="noopener"><strong>终端启动失败</strong><span>演示创建流程中的失败与恢复入口</span></a>
+          <a href="../tests/editor-loading.html" target="_blank" rel="noopener"><strong>编辑器加载</strong><span>文件等待状态与编辑器</span></a>
+          <a href="../tests/loading-motion.html" target="_blank" rel="noopener"><strong>启动加载</strong><span>查看工作台的加载动效</span></a>
+          <a href="./hud.html?stale" target="_blank" rel="noopener"><strong>监视窗连接断开</strong><span>查看最后已知的任务状态</span></a>
+          <a href="./hud.html?empty" target="_blank" rel="noopener"><strong>空白监视窗</strong><span>暂无进行中的任务</span></a>
+          <a href="../tests/page-navigation.html" target="_blank" rel="noopener"><strong>页面切换</strong><span>项目切换、返回和前进</span></a>
+          <a href="../tests/terminal-input-parity.html" target="_blank" rel="noopener"><strong>终端输入对照</strong><span>输入、焦点和键盘操作</span></a>
+          <a href="../tests/terminal-load.html" target="_blank" rel="noopener"><strong>终端输出加载</strong><span>示例终端流和滚动区域</span></a>
+          <a href="../tests/terminal-white-surface.html" target="_blank" rel="noopener"><strong>浅色终端</strong><span>浅色画布与输出渲染</span></a>
+        </div>
+      </section>
+      <section aria-labelledby="references">
+        <h2 id="references">已有设计样本</h2>
+        <div class="links">
+          <a href="../tests/agent-page-design/index.html" target="_blank" rel="noopener"><strong>Agent 页面</strong><span>对比项目已有的设置页面方案</span></a>
+          <a href="../tests/agent-picker-design/index.html" target="_blank" rel="noopener"><strong>Agent 选择器</strong><span>紧凑列表、双列面板和说明列表</span></a>
+          <a href="../tests/settings-navigation-design/index.html" target="_blank" rel="noopener"><strong>设置导航</strong><span>对比三版设置导航样本</span></a>
+          <a href="../tests/agent-settings-polish.html" target="_blank" rel="noopener"><strong>Agent 设置样本</strong><span>工具检测、默认设置和权限覆盖</span></a>
+          <a href="../tests/orca-light-workbench.html" target="_blank" rel="noopener"><strong>浅色工作台样本</strong><span>项目、终端和工具区的浅色样式</span></a>
+          <a href="../tests/orchestration.html" target="_blank" rel="noopener"><strong>编排初版样本</strong><span>查看保留的工作流界面</span></a>
+        </div>
+      </section>
+    </nav>
+  </main>
+</body>
+</html>

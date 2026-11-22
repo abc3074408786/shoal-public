@@ -1,0 +1,10 @@
+import {createServer} from 'vite';
+import react from '@vitejs/plugin-react';
+import {fileURLToPath} from 'node:url';
+import {writeFile} from 'node:fs/promises';
+const root=fileURLToPath(new URL('..',import.meta.url));
+const server=await createServer({root,configFile:false,logLevel:'error',plugins:[react(),{name:'deny-runtime',configureServer(server){server.middlewares.use('/_velella',(_req,res)=>{res.statusCode=403;res.end('Isolated preview: no runtime bridge')})}}],server:{host:'127.0.0.1',port:0}});
+await server.listen();
+const url=server.resolvedUrls.local[0]+'tests/console-pages.html';
+await writeFile(new URL('../../artifacts/interface-a-extension-20261024/preview-server.json',import.meta.url),JSON.stringify({pid:process.pid,url,isolated:true},null,2));
+console.log(url);

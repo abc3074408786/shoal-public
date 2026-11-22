@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <title>Velella — fish</title>
+  <rect width="128" height="128" rx="28" fill="#172321"/>
+  <path d="M35 64 16 46Q13 44 14 49L21 64 14 79Q13 84 17 81Z" fill="#89cdb9"/>
+  <path d="M29 64C36 53 44 46 54 42L66 28Q67 27 68 30L74 40C89 42 101 52 111 64 91 87 65 91 44 79 38 75 33 70 29 64Z" fill="#89cdb9"/>
+  <path d="M49 74Q64 80 75 77L65 91Q64 93 62 90Z" fill="#dce7de"/>
+  <circle cx="88" cy="57" r="4.5" fill="#172321"/>
+</svg>

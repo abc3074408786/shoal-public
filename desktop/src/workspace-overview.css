@@ -1,0 +1,49 @@
+.workspace-overview{display:flex;flex:1;min-block-size:0;overflow:auto;padding:24px;align-items:flex-start;justify-content:center}
+.workspace-overview-content{inline-size:min(100%,760px);margin-block:0}
+.workspace-overview-label{display:flex;align-items:center;gap:8px;color:var(--muted-foreground);font-size:11px;line-height:20px}
+.workspace-overview-heading h1{font-family:var(--font-sans);font-size:16px;font-weight:500;line-height:1.35;margin-block:6px 8px;overflow-wrap:anywhere;letter-spacing:-.02em}
+.workspace-overview-heading p{font-size:13px;line-height:1.7;color:var(--muted-foreground);margin:0}
+.workspace-overview-actions{display:flex;gap:8px;flex-wrap:wrap;margin-block:16px 24px}
+.ide-shell .workspace-overview-actions button{min-block-size:32px;padding:6px 10px;border-radius:6px;border:1px solid var(--border);font-size:12px}
+.workspace-overview-section{border-block-start:1px solid var(--border);padding-block:16px 20px}
+.workspace-overview-section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-block-end:8px;min-block-size:28px}
+.workspace-overview-section-title h2{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:500;margin:0}
+.workspace-overview-section-title h2 small{font-family:var(--font-mono);font-weight:400;font-size:11px;color:var(--muted-foreground)}
+.ide-shell .workspace-overview-section-title button{font-size:11px;color:var(--muted-foreground);min-block-size:26px;padding:4px 0;gap:4px}
+.ide-shell .workspace-overview-row{display:flex;align-items:center;inline-size:100%;min-block-size:32px;gap:10px;padding:8px;border-radius:6px;font-size:12px;justify-content:flex-start;text-align:start}
+.workspace-overview-row>span{flex:1;overflow:clip;white-space:nowrap;text-overflow:ellipsis;min-inline-size:0}
+.workspace-overview-row>svg{flex:none;color:var(--muted-foreground)}
+.workspace-overview-row>small{flex:none;font-size:10px;color:var(--muted-foreground)}
+.workspace-overview-empty{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;min-block-size:38px;margin:0;padding-block:8px;color:var(--muted-foreground);font-size:12px;line-height:1.7}
+.ide-shell .workspace-overview-empty button{min-block-size:28px;padding:4px 8px;font-size:11px}
+.workspace-overview-note{margin-block:4px 0;font-size:11px;line-height:1.7;color:var(--muted-foreground)}
+
+/* A quiet start surface inside the existing project workbench. */
+.project-shell .project-empty-workspace.workspace-start { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; overflow-y: auto; padding-block: clamp(32px, 8vh, 76px); padding-inline: clamp(24px, 5vw, 64px); background: var(--background); }
+.workspace-start-content { inline-size: min(100%, 580px); }
+.workspace-start-heading img { display: block; object-fit: contain; margin-block-end: 24px; opacity: .7; }
+.workspace-start-heading h1 { margin: 0; color: var(--foreground); font-size: 24px; line-height: 1.4; font-weight: 600; letter-spacing: -.025em; }
+.workspace-start-heading p { margin-block: 9px 0; color: var(--muted-foreground); font-size: 13px; line-height: 1.7; }
+.workspace-start-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-block: 26px 20px; }
+.project-shell .workspace-start-actions > button { min-block-size: 38px; padding-inline: 14px; gap: 8px; border: 1px solid var(--border); border-radius: 7px; background: var(--background); color: var(--foreground); font-size: 13px; font-weight: 500; }
+.project-shell .workspace-start-actions > button:first-child { border-color: transparent; background: var(--foreground); color: var(--background); }
+.workspace-start-count { padding-inline: 5px; font-size: 11px; font-variant-numeric: tabular-nums; color: var(--muted-foreground); }
+.workspace-start-tools { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-inline-start: -7px; }
+.project-shell .workspace-start-tools button { min-block-size: 32px; padding-inline: 7px; gap: 7px; border: 0; border-radius: 5px; background: transparent; color: var(--muted-foreground); font-size: 12px; }
+.workspace-start-sessions { margin-block-start: 36px; padding-block-start: 18px; border-block-start: 1px solid var(--border); }
+.workspace-start-section-title { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-block-size: 28px; margin-block-end: 8px; }
+.workspace-start-section-title h2 { margin: 0; color: var(--muted-foreground); font-size: 12px; line-height: 1.5; font-weight: 500; }
+.project-shell .workspace-start-section-title button { min-block-size: 28px; gap: 5px; padding-inline: 4px; border: 0; background: transparent; color: var(--muted-foreground); font-size: 11px; }
+.workspace-start-sessions ul { list-style: none; margin: 0; padding: 0; }
+.project-shell .workspace-start-session { display: grid; grid-template-columns: 18px minmax(0,1fr) auto 14px; gap: 11px; align-items: center; inline-size: 100%; min-block-size: 42px; padding: 9px 8px; border: 0; border-radius: 6px; background: transparent; color: var(--foreground); text-align: start; }
+.workspace-start-session strong { overflow: clip; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 500; }
+.workspace-start-session small { color: var(--muted-foreground); font-size: 11px; }
+.workspace-start-session > svg:last-child { color: var(--muted-foreground); }
+.workspace-start-sessions > p { margin-block: 8px 0; font-size: 12px; line-height: 1.8; color: var(--muted-foreground); }
+.workspace-start button:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.project-shell .workspace-start button:disabled { opacity: .5; cursor: default; }
+.project-shell .workspace-start button:active:not(:disabled) { background: var(--secondary); color: var(--foreground); }
+@media (hover: hover) and (pointer: fine) {
+  .project-shell .workspace-start button:hover:not(:disabled) { background: var(--secondary); color: var(--foreground); }
+  .project-shell .workspace-start-actions > button:first-child:hover:not(:disabled) { background: color-mix(in oklch, var(--foreground) 88%, var(--background)); color: var(--background); }
+}

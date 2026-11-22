@@ -1,0 +1,13 @@
+{
+  "repository": "https://github.com/2233admin/dont-reinvent-the-wheel",
+  "commit": "5d243b76fa093219dfc46566857fb2a95de7f82d",
+  "upstream_version": "0.1",
+  "adaptation": "velella.1",
+  "changes": [
+    "progressive entry and project-local state",
+    "shortlist addition timestamps",
+    "complete-round saturation and legacy handling",
+    "report freshness verification"
+  ],
+  "license": "LICENSE"
+}

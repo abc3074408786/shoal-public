@@ -1,0 +1,32 @@
+.skill-center{display:flex;flex-direction:column;flex:1;min-block-size:0;min-inline-size:0;overflow:clip;font-size:13px;line-height:1.65}
+.skill-toolbar{display:flex;align-items:end;flex-wrap:wrap;gap:12px;padding:16px 24px;border-block-end:1px solid var(--ext-line)}
+.skill-toolbar>label{flex:1;min-inline-size:min(100%,250px)}
+.skill-center label{display:grid;gap:6px;color:var(--ext-muted);font-size:12px;min-inline-size:0}
+.skill-center :is(input,textarea,select){max-inline-size:100%;min-inline-size:0;color:var(--ext-text,inherit);font:inherit}
+.skill-center textarea{min-block-size:100px;resize:vertical}
+.skill-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.skill-workspace{display:flex;flex-wrap:wrap;flex:1;min-block-size:0;overflow:auto}
+.skill-list{flex:1 1 230px;min-inline-size:0;max-block-size:75vh;overflow:auto;border-inline-end:1px solid var(--ext-line);padding:16px}
+.skill-search{display:flex!important;flex-direction:row;align-items:center;gap:8px;margin-block-end:16px}.skill-search input{inline-size:100%}
+.skill-row.ui-button{display:grid;gap:5px;inline-size:100%;text-align:start;justify-content:stretch;white-space:normal;padding:12px;margin-block-end:5px;background:transparent;border-color:transparent}
+.skill-row>span{display:flex;align-items:center;gap:8px;overflow-wrap:anywhere}.skill-row small{font-size:11px;color:var(--ext-muted);overflow-wrap:anywhere}
+.skill-row[aria-pressed=true]{border-color:var(--ext-line);background:color-mix(in oklch,currentColor 6%,var(--ext-bg))}
+.skill-detail{flex:4 1 520px;min-inline-size:0;padding:clamp(16px,2.5vw,28px);display:flex;flex-direction:column;gap:18px;overflow-wrap:anywhere}
+.skill-title,.skill-card>header{display:flex;align-items:start;justify-content:space-between;gap:12px;flex-wrap:wrap}.skill-title h2{font-size:23px;margin-block:4px 8px}
+.skill-title small,.skill-center :is(code,small){color:var(--ext-muted)}
+.skill-center code{font-size:11px;overflow-wrap:anywhere;white-space:normal}
+.skill-card{padding:18px;border:1px solid var(--ext-line);border-radius:8px;min-inline-size:0;display:grid;gap:12px}
+.skill-card :is(h2,h3,p){margin:0}.skill-card h2{font-size:18px}.skill-card h3{font-size:15px}.skill-card p{color:var(--ext-muted);font-size:12px}
+.skill-card details{min-inline-size:0}.skill-center summary{cursor:pointer;font-weight:550}.skill-center summary:focus-visible{outline:2px solid currentColor;outline-offset:4px}
+.skill-center pre{white-space:pre-wrap;overflow-wrap:anywhere;max-block-size:380px;overflow:auto;min-inline-size:0;font:12px/1.8 var(--font-mono,monospace);background:color-mix(in oklch,currentColor 3%,var(--ext-bg));padding:14px;border-radius:5px;margin:0}
+.skill-form{display:grid;gap:12px;border:0;padding:0;margin:0}.skill-agent-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,160px),1fr));gap:12px;border:0;padding:0;margin:0}
+.skill-agent-grid label{padding:10px;border:1px solid var(--ext-line);border-radius:5px}.skill-agent-grid span{display:flex;gap:7px;align-items:center}.skill-agent-grid small{font-size:10px}
+.skill-center input[type=checkbox]{inline-size:14px;block-size:14px;min-block-size:0;accent-color:var(--ext-text)}
+.skill-plans{display:grid;gap:10px}.skill-plans article{display:grid;gap:7px;border-block-end:1px solid var(--ext-line);padding-block:10px}
+.skill-installation{display:flex;align-items:center;justify-content:space-between;gap:10px;border-block-start:1px solid var(--ext-line);padding-block:12px}.skill-installation span{min-inline-size:0}.skill-installation code{display:block}
+.skill-resource.ui-button{display:block;margin-block:6px;text-align:start;white-space:normal;overflow-wrap:anywhere}
+.skill-empty{padding:26px 8px;color:var(--ext-muted)}.skill-empty h2{color:var(--ext-text);font-size:20px}.skill-discovered{margin-block-start:20px}.skill-discovered p{font-size:11px;color:var(--ext-muted)}
+.skill-notice{padding:10px 24px;margin:0;border-block-end:1px solid var(--ext-line);font-size:12px;overflow-wrap:anywhere}
+.skill-center>.source-workspace-links{padding:10px 24px;border-block-end:1px solid var(--ext-line);display:flex;align-items:center;flex-wrap:wrap;gap:10px;font-size:12px}
+.skill-center .ui-button:active{background:color-mix(in oklch,currentColor 12%,var(--ext-bg))}
+@media(hover:hover) and (pointer:fine){.skill-row.ui-button:hover{background:color-mix(in oklch,currentColor 5%,var(--ext-bg))}}

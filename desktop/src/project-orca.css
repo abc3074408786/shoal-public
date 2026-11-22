@@ -1,0 +1,117 @@
+/* Selected B project tree. Keep this import path stable; terminal ownership and
+   existing Radix actions remain in React. Use Velella's UI font and surfaces. */
+html:root:has(.project-shell[data-shell-page="project"]){
+  --worktree-sidebar:light-dark(oklch(98.4% 0 none),oklch(21% .006 250));
+  --worktree-sidebar-foreground:light-dark(oklch(26% 0 none),oklch(94% 0 none));
+  --worktree-sidebar-accent:light-dark(oklch(95.8% 0 none),oklch(27% .006 250));
+  --worktree-sidebar-border:light-dark(oklch(25% 0 none / .09),oklch(100% 0 none / .1));
+  --project-nav-ink:var(--worktree-sidebar-foreground);
+  --project-nav-muted:light-dark(oklch(48% 0 none),oklch(73% 0 none));
+  --project-nav-selected:light-dark(oklch(100% 0 none),oklch(29% .006 250));
+  --project-nav-selected-border:light-dark(oklch(25% 0 none / .16),oklch(100% 0 none / .18));
+  --project-nav-font:var(--font-sans);
+}
+.ide-shell.project-shell[data-shell-page="project"]{border-radius:0}
+.ide-shell.project-shell[data-shell-page="project"]>.ide-sidebar{padding:14px 10px 8px;gap:0;border-inline-end:1px solid var(--worktree-sidebar-border);background:var(--worktree-sidebar);color:var(--project-nav-ink)}
+/* Continue the light toolbar through the reserved space above sidebar search. */
+[data-theme="light"] .ide-shell.project-shell[data-shell-page="project"]>.ide-sidebar::before{content:'';position:absolute;inset-block-start:0;inset-inline:0 -1px;block-size:46px;border-block-end:1px solid var(--border);background:var(--chrome-bg);pointer-events:none}
+.project-shell[data-shell-page="project"] .project-sidebar-heading{margin-block:32px 12px;padding:0 4px;min-block-size:24px;gap:8px;border:0;justify-content:flex-start}
+.project-shell[data-shell-page="project"] .project-sidebar-heading strong{font:600 14px/24px var(--font-sans)}
+.project-sidebar-count{color:var(--project-nav-muted);font:11px/20px var(--font-sans);font-variant-numeric:tabular-nums}
+.project-sidebar-panel{display:flex;flex-direction:column;flex:1;min-block-size:0;min-inline-size:0}
+.project-sidebar-panel:focus-visible{outline:2px solid var(--ring);outline-offset:-2px}
+.project-sidebar-tools{display:flex;align-items:center;flex:none;inline-size:auto;gap:0;margin:0}
+.project-shell[data-shell-page="project"] .project-sidebar-tools>button{display:inline-flex;align-items:center;justify-content:center;flex:none;gap:5px;inline-size:24px;min-inline-size:24px;min-block-size:28px;padding:3px;border:0;border-radius:5px;background:transparent;color:var(--project-nav-muted)}
+.project-shell[data-shell-page="project"] .project-sidebar-tools>.project-sidebar-unread{inline-size:auto;min-inline-size:30px}
+.project-sidebar-tools>button>svg{flex:none;stroke-width:1.5}
+.project-sidebar-unread-count{min-inline-size:6px;font-size:9px;line-height:12px;font-weight:600;font-variant-numeric:tabular-nums}
+.project-shell[data-shell-page="project"] .project-sidebar-tools>button:is(:active,[data-state="open"]){background:var(--worktree-sidebar-accent);color:var(--project-nav-ink)}
+.project-sidebar-tools>button:focus-visible{outline:2px solid var(--ring);outline-offset:-2px}
+.project-toolbar-empty{padding:10px 8px;color:var(--project-nav-muted);font-size:12px;line-height:18px}
+.project-toolbar-check{display:inline-flex;align-items:center;justify-content:center;inline-size:13px;flex:none}
+html:has(.workspace-navigation) .project-toolbar-menu .project-unread-item{display:flex;align-items:flex-start;flex-direction:column;gap:2px;white-space:normal;overflow-wrap:anywhere}
+.project-unread-item small{font-size:10px;color:var(--project-nav-muted)}
+/* Workspace options stay within the current execution host's presentation scope. */
+html:has(.workspace-navigation) .wb-menu-panel.project-action-menu.workspace-options-menu{inline-size:328px;padding:7px;max-block-size:min(720px,var(--radix-dropdown-menu-content-available-height,calc(100dvh - 24px)))}
+html:has(.workspace-navigation) .wb-menu-panel.project-action-menu.workspace-options-sub{inline-size:240px;max-block-size:min(520px,var(--radix-dropdown-menu-content-available-height,calc(100dvh - 24px)))}
+.workspace-options-title{display:block;padding:3px 9px 5px;font-size:15px;line-height:22px;font-weight:650}
+html:has(.workspace-navigation) .project-action-menu .workspace-option-row{display:flex;align-items:center;gap:8px;inline-size:100%;min-block-size:29px;padding:4px 9px;border:0;border-radius:6px;background:transparent;color:inherit;font:500 12px/21px var(--font-sans);cursor:default;white-space:nowrap}
+.workspace-option-row>svg{flex:none;color:var(--project-nav-muted);stroke-width:1.5}
+.workspace-option-row>span:not(.workspace-option-value,.project-toolbar-check,.workspace-option-switch){min-inline-size:0;overflow:clip;text-overflow:ellipsis}
+.workspace-option-value{margin-inline-start:auto;max-inline-size:155px;overflow:clip;text-overflow:ellipsis;white-space:nowrap;color:var(--project-nav-muted);font-size:11px;font-weight:400}
+.workspace-options-note{margin:5px 9px 7px;color:var(--project-nav-muted);font-size:11px;line-height:17px;white-space:normal}
+html:has(.workspace-navigation) .workspace-options-menu .workspace-group-tabs{display:flex;gap:1px;margin:3px 9px 10px;border:1px solid var(--worktree-sidebar-border);border-radius:7px;overflow:clip;background:var(--worktree-sidebar-border)}
+html:has(.workspace-navigation) .workspace-options-menu .workspace-group-tab{display:flex;justify-content:center;flex:1;min-inline-size:0;min-block-size:28px;padding:3px 0;border:0;border-radius:0;background:var(--worktree-sidebar);font:500 11px/20px var(--font-sans);white-space:nowrap}
+html:has(.workspace-navigation) .workspace-options-menu .workspace-group-tab[data-state="checked"]{background:var(--worktree-sidebar-accent);font-weight:650;color:var(--project-nav-ink)}
+.workspace-option-switch{position:relative;flex:none;margin-inline-start:auto;inline-size:27px;block-size:16px;border-radius:9px;background:var(--worktree-sidebar-border);border:1px solid var(--worktree-sidebar-border)}
+.workspace-option-switch::after{content:'';position:absolute;inset-block-start:2px;inset-inline-start:2px;inline-size:10px;block-size:10px;border-radius:50%;background:var(--project-nav-muted)}
+.workspace-option-switch[data-checked="true"]{background:var(--project-nav-ink)}
+.workspace-option-switch[data-checked="true"]::after{inset-inline-start:13px;background:var(--worktree-sidebar)}
+html:has(.workspace-navigation) .project-action-menu .workspace-option-row:active,html:has(.workspace-navigation) .workspace-options-menu .workspace-group-tab:active{background:var(--worktree-sidebar-accent)}
+html:has(.workspace-navigation) .project-action-menu :is(.workspace-option-row,.workspace-group-tab):focus-visible{outline:2px solid var(--ring);outline-offset:-2px}
+.workspace-filter-summary{display:flex;align-items:center;gap:6px;padding:3px 7px 7px;color:var(--project-nav-muted);font-size:11px}
+.workspace-filter-summary>span{flex:1;min-inline-size:0;overflow:clip;text-overflow:ellipsis;white-space:nowrap}
+.workspace-filter-summary>button{flex:none;padding:2px;min-block-size:20px}
+.workspace-view-group{margin-block-end:10px}
+.workspace-navigation .sidebar-workspace-card[data-card-layout="detailed"] .sidebar-workspace-detail{display:flex}
+.workspace-navigation .sidebar-workspace-card .sidebar-workspace-detail{flex-wrap:wrap}
+.workspace-navigation .sidebar-workspace-card .sidebar-workspace-detail:empty{display:none}
+.project-shell .workspace-navigation .sidebar-workspace-card[data-card-layout="compact"]:is(.selected,:not(.selected)){min-block-size:33px}
+.project-shell .workspace-navigation .sidebar-workspace-card[data-card-layout="compact"] .sidebar-workspace-detail{display:none}
+.workspace-navigation .workspace-directory{flex-basis:100%;overflow:clip;text-overflow:ellipsis;white-space:nowrap}
+.project-shell[data-shell-page="project"] .ide-sidebar .project-sidebar-search{flex:1;inline-size:0;min-inline-size:0;margin:0;min-block-size:34px;padding-inline:6px;gap:5px;border:0;background:transparent;border-radius:6px;color:var(--project-nav-muted)}
+.project-shell[data-shell-page="project"] .project-sidebar-search button{flex:none;min-inline-size:20px;min-block-size:24px;padding:2px}
+.project-shell[data-shell-page="project"] .project-sidebar-search input{font-size:12px;line-height:20px;padding-block:4px;color:var(--project-nav-ink)}
+.project-shell[data-shell-page="project"] .project-sidebar-search input::placeholder{color:var(--project-nav-muted)}
+.project-shell[data-shell-page="project"] .ide-sidebar .project-sidebar-list{flex:1;min-block-size:0;margin-block-start:0;padding-inline-end:2px;scrollbar-gutter:stable;scrollbar-color:color-mix(in oklch,var(--project-nav-muted) 35%,transparent) transparent;overscroll-behavior:contain}
+.workspace-navigation .sidebar-project{margin-block-end:9px}
+.workspace-navigation .project-sidebar-row{gap:2px;min-block-size:32px;padding-inline:0 1px;border-radius:6px;color:var(--project-nav-ink)}
+.project-shell .workspace-navigation .project-sidebar-row .sidebar-project-name{padding:0 3px;min-block-size:32px;gap:7px;font-family:var(--project-nav-font);font-size:13px;line-height:20px;font-weight:600;color:var(--project-nav-ink)}
+.sidebar-project-name>svg{flex:none;color:light-dark(oklch(46% .18 255),oklch(78% .12 250));stroke-width:1.5}
+.project-shell .workspace-navigation .project-sidebar-disclosure{inline-size:18px;min-inline-size:18px;min-block-size:28px;padding:2px;color:var(--project-nav-muted)}
+.project-disclosure-arrow{display:flex;align-items:center;justify-content:center}
+.project-workspace-count{flex:none;min-inline-size:16px;text-align:center;font-size:11px;line-height:20px;font-variant-numeric:tabular-nums;color:var(--project-nav-muted)}
+.project-shell .workspace-navigation .project-sidebar-row .project-sidebar-action{inline-size:22px;min-inline-size:22px;min-block-size:26px;padding:3px;color:var(--project-nav-muted)}
+.project-shell .workspace-navigation .sidebar-project-workspaces{margin-block:2px 0;margin-inline-start:18px;padding-inline-start:5px;border-inline-start:1px solid light-dark(oklch(25% 0 none / .07),oklch(100% 0 none / .1))}
+.project-shell .workspace-navigation .sidebar-workspace-card{align-items:flex-start;gap:0;min-block-size:30px;padding:3px 6px 3px 1px;border:1px solid transparent;border-radius:5px;background:transparent;color:var(--project-nav-ink);font-family:var(--project-nav-font)}
+.workspace-navigation .workspace-status-slot{position:relative;display:flex;align-items:center;justify-content:center;inline-size:16px;block-size:21px;margin-inline-end:3px;flex:none}
+.workspace-navigation .workspace-status-slot>.workspace-state-dot{inline-size:6px;block-size:6px;background:var(--project-nav-muted)}
+.workspace-navigation .workspace-status-slot>.workspace-state-dot.in_progress{background:light-dark(oklch(55% .14 155),oklch(77% .12 155))}
+.workspace-navigation .workspace-status-slot>.workspace-state-dot.in_review{background:light-dark(oklch(60% .12 75),oklch(80% .12 75))}
+.workspace-navigation .workspace-status-slot>.workspace-state-dot.done{background:light-dark(oklch(51% .13 295),oklch(76% .11 295))}
+.workspace-status-slot[data-unread]::after{content:'';position:absolute;inline-size:4px;block-size:4px;inset-block-start:0;inset-inline-end:0;border-radius:50%;background:light-dark(oklch(60% .12 75),oklch(80% .12 75));box-shadow:0 0 0 2px var(--worktree-sidebar)}
+.workspace-navigation .sidebar-workspace-summary{gap:2px}
+.workspace-navigation .sidebar-workspace-title{gap:6px;min-block-size:21px;line-height:21px}
+.workspace-navigation .sidebar-workspace-title strong{font-size:13px;line-height:21px;font-weight:400}
+.workspace-navigation .sidebar-workspace-card:is(.unread,.selected) strong{font-weight:600;color:var(--project-nav-ink)}
+.workspace-navigation .workspace-primary-badge{font-family:var(--font-sans);font-size:10px;font-weight:400;line-height:15px;padding-inline:4px;color:var(--project-nav-muted);border-color:var(--worktree-sidebar-border);border-radius:4px;white-space:nowrap}
+.workspace-navigation .sidebar-workspace-detail{display:none;gap:6px;font-size:10px;line-height:16px;color:var(--project-nav-muted)}
+.workspace-navigation .sidebar-workspace-card.selected .sidebar-workspace-detail{display:flex}
+.workspace-navigation .workspace-host-badge{max-inline-size:min(112px,100%);block-size:16px;padding-inline:0;border-radius:3px;background:transparent;font-size:10px;line-height:16px;color:var(--project-nav-muted)}
+.project-shell .workspace-navigation .sidebar-workspace-card.selected{min-block-size:48px;border-color:transparent;border-inline-start:2px solid light-dark(oklch(50% .06 250),oklch(74% .05 250));border-radius:0 4px 4px 0;background:light-dark(oklch(96% .006 250),oklch(26% .009 250));color:var(--project-nav-ink);box-shadow:none}
+.workspace-navigation .sidebar-workspace-card.selected .sidebar-workspace-title strong{font-weight:500}
+.project-workspace-empty{margin:5px 0 7px 16px;font:11px/20px var(--font-sans);color:var(--project-nav-muted)}
+.project-shell .workspace-navigation button:focus-visible{outline:2px solid var(--ring);outline-offset:-2px}
+.project-sidebar-utilities{display:flex;align-items:center;flex:none;min-inline-size:0;gap:2px;padding-inline:2px;border:1px solid var(--worktree-sidebar-border);border-radius:6px;background:var(--worktree-sidebar-accent);margin-block:0 14px}
+.project-shell[data-shell-page="project"] .project-sidebar-footer{padding:9px 0 0;border-block-start:1px solid var(--worktree-sidebar-border);margin-block-start:8px;gap:8px}
+.project-shell[data-shell-page="project"] .project-sidebar-footer>button{flex:none;min-inline-size:28px;min-block-size:30px;padding:5px;border-radius:5px}
+.project-shell[data-shell-page="project"] .project-sidebar-footer>button:active{background:var(--worktree-sidebar-accent)}
+.project-sidebar-utilities button:focus-visible{outline:2px solid var(--ring);outline-offset:-2px}
+.project-shell[data-shell-page="project"] :is(.project-sidebar-heading,.project-sidebar-footer) button{color:var(--project-nav-muted)}
+/* Preserve terminal status colors; fonts and sessions stay user-owned. */
+.project-shell[data-shell-page="project"] :is(.terminal-status,.terminal-activity>header){background:light-dark(#ebedef,#24272e);border-color:light-dark(#d3d7dc,#343842)}
+html:has(.workspace-navigation) .wb-menu-panel.project-action-menu{position:relative;inset:auto;inline-size:224px;min-inline-size:176px;max-inline-size:calc(100dvw - 16px);max-block-size:min(650px,calc(100dvh - 16px));padding:5px;overflow-x:clip;overflow-y:auto;border:1px solid light-dark(oklch(25% 0 none / .12),oklch(100% 0 none / .14));border-radius:10px;background:light-dark(oklch(100% 0 none / .98),oklch(23% .006 250 / .98));color:var(--project-nav-ink);box-shadow:0 12px 36px light-dark(oklch(20% 0 none / .13),oklch(0% 0 none / .4));backdrop-filter:blur(24px);font-family:var(--project-nav-font);-webkit-app-region:no-drag}
+html:has(.workspace-navigation) .project-action-menu :is([role="menuitem"],[role="menuitemradio"]){display:flex;align-items:center;justify-content:flex-start;gap:8px;inline-size:100%;min-block-size:30px;padding:5px 8px;border:0;border-radius:5px;background:transparent;font-family:inherit;font-size:12px;font-weight:400;line-height:20px;color:inherit;cursor:default;white-space:nowrap}
+html:has(.workspace-navigation) .project-action-menu :is([role="menuitem"],[role="menuitemradio"])>svg{inline-size:14px;block-size:14px;stroke-width:1.5;color:var(--project-nav-muted)}
+html:has(.workspace-navigation) .project-action-menu [data-highlighted]{background:var(--worktree-sidebar-accent);outline:2px solid var(--ring);outline-offset:-2px}
+html:has(.workspace-navigation) .project-action-menu .wb-menu-label{display:block;padding:4px 8px;font-size:11px;font-weight:500;line-height:17px;color:var(--project-nav-muted)}
+html:has(.workspace-navigation) .project-action-menu .wb-menu-divider{margin:4px 3px;background:var(--worktree-sidebar-border)}
+html:has(.workspace-navigation) .project-action-menu .project-remove-action,html:has(.workspace-navigation) .project-action-menu .project-remove-action>svg{color:light-dark(oklch(49% .18 25),oklch(76% .14 25))}
+html:has(.workspace-navigation) .project-action-menu [data-disabled]{opacity:.4}
+@media(hover:hover) and (pointer:fine){
+  .project-shell[data-shell-page="project"] .project-sidebar-tools>button:hover:not(:disabled){background:var(--worktree-sidebar-accent);color:var(--project-nav-ink)}
+  .workspace-navigation .project-sidebar-row .project-sidebar-action{opacity:0}
+  .workspace-navigation .project-sidebar-row:is(:hover,:focus-within) .project-sidebar-action,.workspace-navigation .project-sidebar-row .project-sidebar-action[data-state="open"]{opacity:1}
+  .project-shell .workspace-navigation .sidebar-workspace-card:hover:not(.selected){background:color-mix(in oklch,var(--project-nav-ink) 3.5%,var(--worktree-sidebar));color:var(--project-nav-ink)}
+  .project-shell .workspace-navigation .project-sidebar-row button:hover{background:var(--worktree-sidebar-accent);color:var(--project-nav-ink)}
+}

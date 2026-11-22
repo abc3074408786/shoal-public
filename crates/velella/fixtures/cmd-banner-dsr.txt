@@ -1,0 +1,4 @@
+[6nMicrosoft Windows [Version 10.0.26200.3756]
+(c) Microsoft Corporation。保留所有权利。
+
+C:\Users\developer>

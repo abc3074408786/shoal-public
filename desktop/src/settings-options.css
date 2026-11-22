@@ -1,0 +1,40 @@
+.app-settings-page .app-settings-nav{overflow-y:auto;min-block-size:0;scrollbar-width:thin;}
+.app-settings-page .app-settings-nav>button{flex-shrink:0;}
+.settings-options{display:flex;flex-direction:column;gap:0;}
+.settings-option-row{display:flex;align-items:center;justify-content:space-between;gap:20px;padding-block:18px;border-block-end:1px solid color-mix(in srgb,var(--border) 60%,transparent);}
+.settings-option-row>div:first-child{flex:1;min-inline-size:0;}
+.settings-option-row strong{font-size:13px;font-weight:550;}
+.settings-option-row p{margin-block-start:5px;max-inline-size:52ch;}
+.settings-option-control{display:flex;align-items:center;justify-content:flex-end;gap:8px;max-inline-size:55%;}
+.settings-options select,.settings-options input:not([type=checkbox]){inline-size:200px;max-inline-size:100%;min-block-size:34px;border:1px solid var(--border);border-radius:7px;background:var(--card);color:var(--foreground);padding:6px 9px;font:inherit;font-size:12px;}
+.settings-options input[type=number]{inline-size:100px;}
+.settings-options :is(select,input,button):focus-visible{outline:2px solid var(--ring,var(--primary));outline-offset:2px;}
+.settings-options h4{font-size:13px;font-weight:600;margin:28px 0 10px;}
+.settings-options>.error{margin-block-start:16px;color:var(--danger);}
+.settings-section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-block-start:28px;}
+.settings-section-heading h4{margin:0;}
+.settings-options .settings-keybinding{min-inline-size:130px;background:var(--card);border:1px solid var(--border);border-radius:6px;}
+.settings-options .settings-keybinding[aria-pressed=true]{outline:2px solid var(--primary);outline-offset:2px;}
+.settings-type-preview{margin-block-start:28px;padding:24px;background:var(--card);border-radius:10px;}
+.settings-type-preview strong{font-size:19px;font-weight:550;}
+.settings-type-preview p{margin-block:10px 20px;}
+.settings-type-preview code{font-size:12px;}
+.settings-inline-action{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-block-start:24px;}
+.settings-options>button{align-self:flex-start;margin-block-start:20px;}
+.settings-account-group{margin-block-start:16px;border-block-end:1px solid var(--border);}
+.settings-account-profile{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 0;}
+.settings-account-profile>div:first-child{min-inline-size:0;display:grid;gap:5px;}
+.settings-account-profile strong{font-size:13px;}
+.settings-account-profile code{overflow-wrap:anywhere;font-size:11px;color:var(--muted-foreground);}
+.settings-account-profile>div:last-child{display:flex;gap:6px;flex-shrink:0;}
+.settings-account-form{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px;margin-block:10px 18px;}
+.settings-account-form>label{display:grid;gap:6px;flex:1 1 160px;font-size:12px;}
+.settings-account-form>label:nth-child(3){flex-basis:100%;}
+.settings-account-form input,.settings-account-form select{inline-size:100%;}
+.settings-command{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-block:6px;}
+.settings-options details{margin-block-start:24px;font-size:12px;}
+.settings-options details p{margin-block:12px;}
+.app-settings .settings-terminal-fields{display:grid;gap:18px;}
+.app-settings .settings-terminal-fields>label{display:flex;align-items:center;justify-content:space-between;gap:20px;font-size:13px;}
+.app-settings .settings-terminal-fields :is(input:not([type=checkbox]),select){max-inline-size:55%;inline-size:240px;font-size:12px;min-block-size:34px;}
+@media(max-width:600px){.settings-option-row{gap:12px;align-items:flex-start;flex-wrap:wrap;}.settings-option-control{max-inline-size:100%;}.settings-option-control:has(select),.settings-option-control:has(input){inline-size:100%;justify-content:flex-start;}.settings-account-profile{align-items:flex-start;flex-wrap:wrap;}.settings-option-row:has(.settings-keybinding)>div:first-child{flex-basis:100%;}.settings-options .settings-keybinding{min-inline-size:120px;}.settings-type-preview{padding:18px;}}
